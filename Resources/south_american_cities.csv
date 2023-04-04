@@ -1,0 +1,501 @@
+"city","population","country","lat","lng"
+"Buenos Aires",13076300,"Argentina",-34.6132,-58.3772
+"Sao Paulo",10021295,"Brazil",-23.5475,-46.6361
+"Lima",7737002,"Peru",-12.0432,-77.0282
+"Bogota",7674366,"Colombia",4.60971,-74.0817
+"Rio de Janeiro",6023699,"Brazil",-22.9064,-43.1822
+"Santiago",4837295,"Chile",-33.4569,-70.6483
+"Caracas",3000000,"Venezuela",10.488,-66.8792
+"Salvador",2711840,"Brazil",-12.9711,-38.5108
+"Fortaleza",2400000,"Brazil",-3.71722,-38.5431
+"Cali",2392877,"Colombia",3.43722,-76.5225
+"Belo Horizonte",2373224,"Brazil",-19.9208,-43.9378
+"Maracaibo",2225000,"Venezuela",10.6666,-71.6124
+"Brasilia",2207718,"Brazil",-15.7797,-47.9297
+"La Paz",2004652,"Bolivia",-16.5,-68.15
+"Medellin",1999979,"Colombia",6.25184,-75.5636
+"Guayaquil",1952029,"Ecuador",-2.19616,-79.8862
+"Santa Cruz de la Sierra",1831434,"Bolivia",-17.7863,-63.1812
+"Maracay",1754256,"Venezuela",10.2353,-67.5911
+"Curitiba",1718421,"Brazil",-25.4278,-49.2731
+"Valencia",1619470,"Venezuela",10.162,-68.0077
+"Manaus",1598210,"Brazil",-3.10194,-60.025
+"Asuncion",1482200,"Paraguay",-25.2865,-57.647
+"Recife",1478098,"Brazil",-8.05389,-34.8811
+"Cordoba",1428214,"Argentina",-31.4135,-64.1811
+"Belem",1407737,"Brazil",-1.45583,-48.5044
+"Quito",1399814,"Ecuador",-0.22985,-78.5249
+"Barranquilla",1380425,"Colombia",10.9685,-74.7813
+"Porto Alegre",1372741,"Brazil",-30.0328,-51.2302
+"Montevideo",1270737,"Uruguay",-34.9033,-56.1882
+"Rosario",1173533,"Argentina",-32.9468,-60.6393
+"Goiania",1171195,"Brazil",-16.6786,-49.2539
+"Guarulhos",1169577,"Brazil",-23.4628,-46.5333
+"Barquisimeto",1114097,"Venezuela",10.0647,-69.357
+"Campinas",1031554,"Brazil",-22.9056,-47.0608
+"Nova Iguacu",1002118,"Brazil",-22.7592,-43.4511
+"Maceio",954991,"Brazil",-9.66583,-35.7353
+"Cartagena",952024,"Colombia",10.3997,-75.5144
+"Ciudad Guayana",950052,"Venezuela",8.35122,-62.641
+"Sao Luis",917237,"Brazil",-2.52972,-44.3028
+"Mendoza",876884,"Argentina",-32.8908,-68.8272
+"Cochabamba",841276,"Bolivia",-17.3895,-66.1568
+"Arequipa",841130,"Peru",-16.3989,-71.535
+"Duque de Caxias",818329,"Brazil",-22.7856,-43.3117
+"Callao",813264,"Peru",-12.0566,-77.1181
+"San Miguel de Tucuman",781023,"Argentina",-26.8241,-65.2226
+"Natal",763043,"Brazil",-5.795,-35.2094
+"Trujillo",747450,"Peru",-8.11599,-79.03
+"Teresina",744512,"Brazil",-5.08917,-42.8019
+"Sao Bernardo do Campo",743372,"Brazil",-23.6939,-46.565
+"Campo Grande",729151,"Brazil",-20.4428,-54.6464
+"Cucuta",721398,"Colombia",7.89391,-72.5078
+"Jaboatao",702621,"Brazil",-8.18028,-35.0014
+"La Plata",694167,"Argentina",-34.9215,-57.9545
+"Osasco",677856,"Brazil",-23.5325,-46.7917
+"Santo Andre",662373,"Brazil",-23.6639,-46.5383
+"Joao Pessoa",650883,"Brazil",-7.115,-34.8631
+"Jaboatao dos Guararapes",630008,"Brazil",-8.11278,-35.0147
+"Contagem",627123,"Brazil",-19.9317,-44.0536
+"Ribeirao Preto",619746,"Brazil",-21.1775,-47.8103
+"Feira de Santana",619609,"Brazil",-12.2667,-38.9667
+"Sao Jose dos Campos",613764,"Brazil",-23.1794,-45.8869
+"Chiclayo",577375,"Peru",-6.77137,-79.8409
+"Bucaramanga",571820,"Colombia",7.12539,-73.1198
+"Uberlandia",563536,"Brazil",-18.9186,-48.2772
+"Sorocaba",558862,"Brazil",-23.5017,-47.4581
+"Mar del Plata",553935,"Argentina",-38.0004,-57.5562
+"Maturin",529376,"Venezuela",9.74569,-63.1832
+"Cuiaba",521934,"Brazil",-15.5961,-56.0967
+"Salta",512686,"Argentina",-24.7859,-65.4117
+"Aparecida de Goiania",510770,"Brazil",-16.8233,-49.2439
+"Puente Alto",510417,"Chile",-33.6117,-70.5758
+"Barcelona",506016,"Venezuela",10.1362,-64.6862
+"Aracaju",490175,"Brazil",-10.9111,-37.0717
+"Santa Fe",489505,"Argentina",-31.6488,-60.7087
+"Londrina",471832,"Brazil",-23.3103,-51.1628
+"Juiz de Fora",470193,"Brazil",-21.7642,-43.3503
+"Belford Roxo",466096,"Brazil",-22.7642,-43.3994
+"Joinville",461304,"Brazil",-26.3044,-48.8456
+"Niteroi",456456,"Brazil",-22.8833,-43.1036
+"Sao Joao de Meriti",454849,"Brazil",-22.8039,-43.3722
+"San Juan",447048,"Argentina",-31.5375,-68.5364
+"Pereira",440118,"Colombia",4.81333,-75.6961
+"Iquitos",437620,"Peru",-3.74912,-73.2538
+"Ananindeua",433956,"Brazil",-1.36556,-48.3722
+"Santa Marta",431781,"Colombia",11.2408,-74.199
+"Ciudad Bolivar",431481,"Venezuela",8.12923,-63.5409
+"Cumana",424822,"Venezuela",10.454,-64.1826
+"Ibague",421685,"Colombia",4.43889,-75.2322
+"Florianopolis",412724,"Brazil",-27.5967,-48.5492
+"Santos",411403,"Brazil",-23.9608,-46.3336
+"Ribeirao das Neves",406802,"Brazil",-19.7669,-44.0867
+"Vila Velha",394930,"Brazil",-20.3297,-40.2925
+"Serra",394153,"Brazil",-20.1286,-40.3078
+"Bello",392939,"Colombia",6.33732,-75.558
+"Diadema",390633,"Brazil",-23.6861,-46.6228
+"Campos dos Goytacazes",387417,"Brazil",-21.7523,-41.3304
+"Resistencia",387158,"Argentina",-27.4606,-58.9839
+"Maua",386069,"Brazil",-23.6678,-46.4614
+"Betim",384000,"Brazil",-19.9678,-44.1983
+"Pasto",382236,"Colombia",1.21361,-77.2811
+"Caxias do Sul",381270,"Brazil",-29.1681,-51.1794
+"Huancayo",376657,"Peru",-12.0651,-75.2049
+"Sao Jose do Rio Preto",374699,"Brazil",-20.8197,-49.3794
+"Puerto La Cruz",370000,"Venezuela",10.2138,-64.6328
+"Olinda",366754,"Brazil",-8.00889,-34.8553
+"Petare",364684,"Venezuela",10.4768,-66.8079
+"Carapicuiba",361112,"Brazil",-23.5227,-46.835
+"Manizales",357814,"Colombia",5.06889,-75.5174
+"Santiago del Estero",354692,"Argentina",-27.7951,-64.2615
+"Barinas",353442,"Venezuela",8.62261,-70.2075
+"Neiva",352855,"Colombia",2.9273,-75.2819
+"Campina Grande",348936,"Brazil",-7.23056,-35.8811
+"Turmero",344700,"Venezuela",10.2286,-67.4742
+"Soledad",342556,"Colombia",10.9184,-74.7646
+"Piracicaba",342209,"Brazil",-22.7253,-47.6492
+"Corrientes",339067,"Argentina",-27.4678,-58.8344
+"Macapa",338936,"Brazil",0.03889,-51.0664
+"Itaquaquecetuba",336679,"Brazil",-23.4861,-46.3483
+"Bauru",335024,"Brazil",-22.3147,-49.0606
+"Montes Claros",332379,"Brazil",-16.735,-43.8617
+"Canoas",328291,"Brazil",-29.9178,-51.1836
+"Mogi das Cruzes",325746,"Brazil",-23.5228,-46.1883
+"Piura",325466,"Peru",-5.19449,-80.6328
+"Sao Vicente",324457,"Brazil",-23.9631,-46.3919
+"Posadas",323739,"Argentina",-27.3671,-55.8961
+"Villavicencio",321717,"Colombia",4.142,-73.6266
+"Jundiai",321589,"Brazil",-23.1864,-46.8842
+"Ciudad del Este",320782,"Paraguay",-25.5097,-54.6111
+"Pelotas",320674,"Brazil",-31.77,-52.341
+"Moron",319934,"Argentina",-34.6509,-58.6196
+"Anapolis",319587,"Brazil",-16.3267,-48.9528
+"Chimbote",316966,"Peru",-9.08528,-78.5783
+"Armenia",315328,"Colombia",4.53389,-75.6811
+"Soacha",313945,"Colombia",4.57937,-74.2168
+"Vitoria",312656,"Brazil",-20.3194,-40.3378
+"Cusco",312140,"Peru",-13.5226,-71.9673
+"Maringa",311724,"Brazil",-23.4253,-51.9386
+"Pucallpa",310750,"Peru",-8.37915,-74.5539
+"Guaruja",310424,"Brazil",-23.9931,-46.2564
+"Antofagasta",309832,"Chile",-23.6524,-70.3954
+"Valledupar",308237,"Colombia",10.4631,-73.2532
+"Porto Velho",306180,"Brazil",-8.76194,-63.9039
+"San Salvador de Jujuy",305891,"Argentina",-24.1946,-65.2971
+"Franca",305041,"Brazil",-20.5386,-47.4008
+"Merida",300000,"Venezuela",8.58972,-71.1561
+"Vina del Mar",294551,"Chile",-33.0246,-71.5518
+"Blumenau",293949,"Brazil",-26.9194,-49.0661
+"Foz do Iguacu",293523,"Brazil",-25.5478,-54.5881
+"Ponta Grossa",292177,"Brazil",-25.095,-50.1619
+"Cabimas",291147,"Venezuela",10.3991,-71.4521
+"Paulista",289971,"Brazil",-7.94083,-34.8731
+"San Cristobal",289852,"Venezuela",7.76694,-72.225
+"Limeira",289665,"Brazil",-22.5647,-47.4017
+"Viamao",285269,"Brazil",-30.0811,-51.0233
+"Alto Barinas",284289,"Venezuela",8.5931,-70.2261
+"Suzano",283314,"Brazil",-23.5425,-46.3108
+"Valparaiso",282448,"Chile",-33.036,-71.6296
+"Itaguei",281853,"Colombia",6.18461,-75.5991
+"Tacna",280098,"Peru",-18.0147,-70.2536
+"Santa Teresa del Tuy",278890,"Venezuela",10.2329,-66.6647
+"Cuenca",276964,"Ecuador",-2.90055,-79.0045
+"Bahia Blanca",276546,"Argentina",-38.7196,-62.2724
+"Caucaia",275019,"Brazil",-3.73611,-38.6531
+"Petropolis",272691,"Brazil",-22.505,-43.1786
+"Monteria",272420,"Colombia",8.74798,-75.8814
+"Parana",262295,"Argentina",-31.7327,-60.529
+"Sincelejo",261187,"Colombia",9.30472,-75.3978
+"Uberaba",260843,"Brazil",-19.7483,-47.9319
+"Popayan",258653,"Colombia",2.43823,-76.6132
+"Rio Branco",257642,"Brazil",-9.97472,-67.81
+"Cascavel",257172,"Brazil",-24.9558,-53.4553
+"Novo Hamburgo",253841,"Brazil",-29.6783,-51.1306
+"Vitoria da Conquista",253137,"Brazil",-14.8661,-40.8394
+"Talcahuano",252968,"Chile",-36.7249,-73.1168
+"Floridablanca",252267,"Colombia",7.06222,-73.0864
+"Barueri",251994,"Brazil",-23.5106,-46.8761
+"Santiago de Surco",251648,"Peru",-12.1359,-77.0074
+"Taubate",251641,"Brazil",-23.0264,-45.5553
+"Governador Valadares",250878,"Brazil",-18.8511,-41.9494
+"Praia Grande",250027,"Brazil",-24.0058,-46.4028
+"San Bernardo",249858,"Chile",-33.5922,-70.6996
+"Varzea Grande",249752,"Brazil",-15.6467,-56.1325
+"Volta Redonda",249580,"Brazil",-22.5231,-44.1042
+"Santa Maria",249219,"Brazil",-29.6842,-53.8069
+"Guarenas",248588,"Venezuela",10.4703,-66.6193
+"Palmira",247986,"Colombia",3.53944,-76.3036
+"Ica",246844,"Peru",-14.0678,-75.7286
+"Coro",246657,"Venezuela",11.4045,-69.6734
+"Juliaca",245675,"Peru",-15.5,-70.1333
+"Valera",244708,"Venezuela",9.31778,-70.6036
+"Baruta",244216,"Venezuela",10.4342,-66.8756
+"Merlo",244168,"Argentina",-34.6663,-58.7293
+"Santa Luzia",243503,"Brazil",-19.7697,-43.8514
+"Neuquen",242092,"Argentina",-38.9516,-68.0591
+"Buenaventura",240387,"Colombia",3.8801,-77.0312
+"Gravatai",238778,"Brazil",-29.9422,-50.9928
+"Temuco",238129,"Chile",-38.7397,-72.5984
+"Caruaru",235371,"Brazil",-8.28333,-35.9761
+"Boa Vista",235150,"Brazil",2.81972,-60.6733
+"Georgetown",235017,"Guyana",6.80448,-58.1553
+"Jose C. Paz",230208,"Argentina",-34.5154,-58.7681
+"Quilmes",230000,"Argentina",-34.729,-58.2637
+"Rio Verde",229651,"Brazil",-17.7981,-50.9281
+"San Fernando de Apure",229197,"Venezuela",7.88782,-67.4724
+"Ipatinga",228746,"Brazil",-19.4683,-42.5367
+"Sumare",227977,"Brazil",-22.8219,-47.2669
+"San Lorenzo",227876,"Paraguay",-25.3397,-57.5088
+"Guatire",227666,"Venezuela",10.474,-66.5424
+"Iquique",227499,"Chile",-20.2133,-70.1503
+"Pilar",226517,"Argentina",-34.4587,-58.9142
+"Juazeiro do Norte",225230,"Brazil",-7.21306,-39.3153
+"Sucre",224838,"Bolivia",-19.0333,-65.2627
+"Paramaribo",223757,"Suriname",5.86638,-55.1668
+"El Tigre",222450,"Venezuela",8.88902,-64.2527
+"Embu",221733,"Brazil",-23.6489,-46.8522
+"Formosa",221383,"Argentina",-26.1849,-58.1731
+"Imperatriz",218106,"Brazil",-5.52639,-47.4917
+"Colombo",217000,"Brazil",-25.2917,-49.2242
+"Porlamar",216234,"Venezuela",10.9577,-63.8697
+"Concepcion",215413,"Chile",-36.827,-73.0498
+"Taboao da Serra",214523,"Brazil",-23.6261,-46.7917
+"Jacarei",213110,"Brazil",-23.3053,-45.9658
+"Rancagua",212695,"Chile",-34.1708,-70.7444
+"Marilia",212218,"Brazil",-22.2139,-49.9458
+"Presidente Prudente",209502,"Brazil",-22.1256,-51.3889
+"Sao Leopoldo",209229,"Brazil",-29.7603,-51.1472
+"Alvorada",209213,"Brazil",-29.9904,-51.0781
+"Oruro",208684,"Bolivia",-17.9833,-67.15
+"San Felipe",206270,"Venezuela",10.3399,-68.7425
+"Itabuna",205660,"Brazil",-14.7856,-39.2803
+"Sao Carlos",205035,"Brazil",-22.0175,-47.8908
+"Hortolandia",203533,"Brazil",-22.8583,-47.22
+"Mossoro",202005,"Brazil",-5.1875,-37.3442
+"Itapevi",201748,"Brazil",-23.5489,-46.9342
+"Sete Lagoas",201334,"Brazil",-19.4658,-44.2467
+"La Pintana",201178,"Chile",-33.5833,-70.6342
+"Santo Domingo de los Colorados",200421,"Ecuador",-0.25305,-79.1754
+"Sao Jose",200000,"Brazil",-28.2117,-49.1632
+"Guacara",198883,"Venezuela",10.2261,-67.877
+"Capiata",198553,"Paraguay",-25.3552,-57.4454
+"Machala",198123,"Ecuador",-3.25861,-79.9605
+"Talca",197479,"Chile",-35.4264,-71.6554
+"Palmas",196272,"Brazil",-10.1674,-48.3277
+"Parauapebas",196259,"Brazil",-6.0675,-49.9022
+"Americana",196022,"Brazil",-22.7392,-47.3314
+"Guanare",194688,"Venezuela",9.04183,-69.7421
+"Petrolina",194650,"Brazil",-9.39861,-40.5008
+"Divinopolis",193832,"Brazil",-20.1436,-44.8907
+"Maracanau",193529,"Brazil",-3.87667,-38.6256
+"Barrancabermeja",191403,"Colombia",7.06528,-73.8547
+"Planaltina",189412,"Brazil",-15.6179,-47.6487
+"Santarem",189047,"Brazil",-2.44306,-54.7083
+"San Fernando del Valle de Catamarca",188812,"Argentina",-28.4696,-65.7852
+"Camacari",188758,"Brazil",-12.6975,-38.3242
+"Acarigua",188278,"Venezuela",9.55451,-69.1956
+"Santa Barbara d'Oeste",188000,"Brazil",-22.7536,-47.4136
+"Rio Grande",187838,"Brazil",-32.035,-52.0986
+"Cachoeiro de Itapemirim",187019,"Brazil",-20.8489,-41.1128
+"Arica",185999,"Chile",-18.4746,-70.2979
+"Santa Anita - Los Ficus",184614,"Peru",-12.0505,-76.9734
+"San Luis",183982,"Argentina",-33.295,-66.3356
+"Manta",183166,"Ecuador",-0.96212,-80.7127
+"Cua",182558,"Venezuela",10.1624,-66.8825
+"Itaborai",182498,"Brazil",-22.7444,-42.8594
+"Araure",181820,"Venezuela",9.58144,-69.2385
+"Sacaba",180726,"Bolivia",-17.398,-66.0383
+"Rio Claro",180147,"Brazil",-22.4114,-47.5614
+"Indaiatuba",179911,"Brazil",-23.0884,-47.2119
+"Dosquebradas",179583,"Colombia",4.83916,-75.6673
+"Passo Fundo",179529,"Brazil",-28.2628,-52.4067
+"Cotia",174828,"Brazil",-23.6039,-46.9192
+"Puerto Cabello",174000,"Venezuela",10.4731,-68.0125
+"Quillacollo",172405,"Bolivia",-17.3923,-66.2784
+"Francisco Morato",171790,"Brazil",-23.2817,-46.7453
+"Portoviejo",170326,"Ecuador",-1.05458,-80.4545
+"Aracatuba",170024,"Brazil",-21.2089,-50.4328
+"Calabozo",168605,"Venezuela",8.92416,-67.4293
+"Araraquara",168468,"Brazil",-21.7944,-48.1756
+"Ferraz de Vasconcelos",167900,"Brazil",-23.5408,-46.3686
+"Eloy Alfaro",167784,"Ecuador",-2.17579,-79.8552
+"Berazategui",167498,"Argentina",-34.7653,-58.2128
+"Carupano",167187,"Venezuela",10.6652,-63.2539
+"Arapiraca",166562,"Brazil",-9.7525,-36.6611
+"Ocumare del Tuy",166072,"Venezuela",10.1182,-66.7751
+"Tulua",165501,"Colombia",4.08466,-76.1954
+"Esmeraldas",165216,"Ecuador",0.9592,-79.654
+"Lages",164676,"Brazil",-27.8161,-50.3261
+"Barra Mansa",164052,"Brazil",-22.5442,-44.1714
+"Nossa Senhora do Socorro",163993,"Brazil",-10.855,-37.1261
+"Envigado",163007,"Colombia",6.17591,-75.5917
+"La Rioja",162620,"Argentina",-29.4111,-66.8507
+"Dourados",162202,"Brazil",-22.2211,-54.8056
+"Criciuma",161954,"Brazil",-28.6775,-49.3697
+"Coquimbo",161317,"Chile",-29.9533,-71.3395
+"San Juan de los Morros",160868,"Venezuela",9.91152,-67.3538
+"Sullana",160789,"Peru",-4.90389,-80.6853
+"Chapeco",160157,"Brazil",-27.0964,-52.6183
+"Puerto Montt",160054,"Chile",-41.4693,-72.9424
+"Tarija",159269,"Bolivia",-21.5355,-64.7296
+"Barreiras",158292,"Brazil",-12.1528,-44.99
+"Sobral",157996,"Brazil",-3.68611,-40.3497
+"San Miguel",157532,"Argentina",-34.5434,-58.7123
+"Ciudad Ojeda",156957,"Venezuela",10.2016,-71.3148
+"Itajai",155716,"Brazil",-26.9078,-48.6619
+"Ilheus",155499,"Brazil",-14.7936,-39.0395
+"La Serena",154521,"Chile",-29.9045,-71.2489
+"Ambato",154369,"Ecuador",-1.24908,-78.6168
+"Rio Cuarto",153757,"Argentina",-33.1307,-64.3499
+"Angra dos Reis",153635,"Brazil",-23.0067,-44.3181
+"Nova Friburgo",153361,"Brazil",-22.2819,-42.5311
+"Valle de La Pascua",153136,"Venezuela",9.21554,-66.0073
+"Chincha Alta",153076,"Peru",-13.4099,-76.1323
+"Rondonopolis",152912,"Brazil",-16.4708,-54.6356
+"Balvanera",152198,"Argentina",-34.6103,-58.3977
+"Itapecerica da Serra",151605,"Brazil",-23.7169,-46.8492
+"Guarapuava",150850,"Brazil",-25.3905,-51.4654
+"Chillan",150396,"Chile",-36.6066,-72.1034
+"Parnamirim",150343,"Brazil",-5.91556,-35.2628
+"El Limon",148247,"Venezuela",10.3059,-67.6321
+"Caxias",148072,"Brazil",-4.85889,-43.3561
+"Huanuco",147959,"Peru",-9.93062,-76.2422
+"Nilopolis",147281,"Brazil",-22.8075,-43.4139
+"Pocos de Caldas",146588,"Brazil",-21.7878,-46.5614
+"Maraba",145860,"Brazil",-5.38146,-49.1323
+"Concordia",145210,"Argentina",-31.393,-58.0209
+"Luziania",143601,"Brazil",-16.2525,-47.9503
+"Cabo",143105,"Brazil",-8.28333,-35.0333
+"Calama",143084,"Chile",-22.4567,-68.9237
+"Macae",143029,"Brazil",-22.3848,-41.7832
+"Punto Fijo",141729,"Venezuela",11.6915,-70.1992
+"Ibirite",141374,"Brazil",-20.0219,-44.0589
+"Lauro de Freitas",141280,"Brazil",-12.8944,-38.3272
+"Potosi",141251,"Bolivia",-19.5836,-65.7531
+"Paranagua",141013,"Brazil",-25.5163,-48.5254
+"Comodoro Rivadavia",140850,"Argentina",-45.8641,-67.4966
+"Los Teques",140617,"Venezuela",10.3445,-67.0433
+"Ayacucho",140033,"Peru",-13.1588,-74.2232
+"Anaco",139397,"Venezuela",9.42958,-64.4643
+"Belgrano",138942,"Argentina",-34.5627,-58.4583
+"Tariba",138402,"Venezuela",7.8188,-72.2243
+"Parnaiba",138008,"Brazil",-2.90472,-41.7767
+"Itu",137586,"Brazil",-23.2642,-47.2992
+"Castanhal",137406,"Brazil",-1.29389,-47.9264
+"Sao Caetano do Sul",136453,"Brazil",-23.6231,-46.5511
+"Osorno",135773,"Chile",-40.574,-73.1335
+"Queimados",135741,"Brazil",-22.7161,-43.5553
+"Cajamarca",135000,"Peru",-7.16378,-78.5003
+"Cartago",134827,"Colombia",4.74639,-75.9117
+"Milagro",133508,"Ecuador",-2.13404,-79.5941
+"Valdivia",133419,"Chile",-39.8142,-73.2459
+"Ibarra",132977,"Ecuador",0.35171,-78.1223
+"Pindamonhangaba",132218,"Brazil",-22.9239,-45.4617
+"Sapucaia",130937,"Brazil",-29.8333,-51.15
+"Maicao",130348,"Colombia",11.3784,-72.2395
+"Florencia",130337,"Colombia",1.61438,-75.6062
+"Girardot City",130289,"Colombia",4.30079,-74.8075
+"Quilpue",130263,"Chile",-33.0475,-71.4425
+"Jaragua do Sul",130130,"Brazil",-26.4861,-49.0667
+"San Martin",130000,"Peru",-5.18591,-80.6693
+"Copiapo",129280,"Chile",-27.3668,-70.3314
+"Charallave",129182,"Venezuela",10.2425,-66.8572
+"Palo Negro",128875,"Venezuela",10.1739,-67.5419
+"Mogi Guacu",128865,"Brazil",-22.3677,-46.9455
+"San Nicolas de los Arroyos",127742,"Argentina",-33.3343,-60.2108
+"Jequie",127475,"Brazil",-13.8588,-40.0851
+"La Victoria",126721,"Venezuela",10.2268,-67.3312
+"Sogamoso",126551,"Colombia",5.71434,-72.9339
+"Lambare",126377,"Paraguay",-25.3468,-57.6065
+"Itapetininga",126243,"Brazil",-23.5917,-48.0531
+"Patos de Minas",126234,"Brazil",-18.5789,-46.5181
+"Puerto Ayacucho",125840,"Venezuela",5.66049,-67.5834
+"Los Angeles",125430,"Chile",-37.4697,-72.3537
+"Braganca Paulista",125096,"Brazil",-22.9527,-46.5442
+"Riobamba",124478,"Ecuador",-1.67098,-78.6471
+"Timon",124427,"Brazil",-5.09417,-42.8367
+"Sao Jose dos Pinhais",124224,"Brazil",-25.5302,-49.2084
+"Teresopolis",123979,"Brazil",-22.4167,-42.9782
+"Uruguaiana",123480,"Brazil",-29.7547,-57.0883
+"Porto Seguro",123173,"Brazil",-16.4497,-39.0647
+"Alagoinhas",122688,"Brazil",-12.1356,-38.4192
+"Palhoca",122423,"Brazil",-27.6453,-48.6678
+"Barbacena",122211,"Brazil",-21.2258,-43.7736
+"Carora",121741,"Venezuela",10.1728,-70.081
+"Cachoeirinha",121084,"Brazil",-29.9511,-51.0939
+"Ejido",120978,"Venezuela",8.54665,-71.2409
+"San Carlos",120375,"Venezuela",9.66124,-68.5827
+"Fernando de la Mora",120167,"Paraguay",-25.3386,-57.5217
+"Santa Rita",119893,"Brazil",-7.11389,-34.9781
+"Quevedo",119436,"Ecuador",-1.02863,-79.4635
+"Toledo",119313,"Brazil",-24.7136,-53.7431
+"Jau",119206,"Brazil",-22.2964,-48.5578
+"Cagua",119033,"Venezuela",10.1863,-67.4594
+"Cubatao",118410,"Brazil",-23.895,-46.4253
+"Guadalajara de Buga",118004,"Colombia",3.90089,-76.2978
+"Loja",117796,"Ecuador",-3.99313,-79.2042
+"Tunja",117479,"Colombia",5.53528,-73.3678
+"Punta Arenas",117430,"Chile",-53.1548,-70.9113
+"Pinhais",117000,"Brazil",-25.4447,-49.1925
+"Simoes Filho",116662,"Brazil",-12.7844,-38.4039
+"Varginha",116571,"Brazil",-21.5514,-45.4303
+"Puno",116552,"Peru",-15.8422,-70.0199
+"Mariara",116142,"Venezuela",10.2953,-67.7177
+"Sinop",116013,"Brazil",-11.8642,-55.5025
+"Tinaquillo",115937,"Venezuela",9.91861,-68.3047
+"Pouso Alegre",115201,"Brazil",-22.23,-45.9364
+"Eunapolis",114275,"Brazil",-16.3775,-39.5803
+"Villa Lugano",114000,"Argentina",-34.6791,-58.4726
+"Punta Cardon",113999,"Venezuela",11.6581,-70.215
+"Botucatu",113862,"Brazil",-22.8858,-48.445
+"Jandira",113605,"Brazil",-23.5275,-46.9025
+"Yaritagua",113343,"Venezuela",10.0808,-69.1242
+"Upata",112617,"Venezuela",8.0162,-62.4056
+"Ribeirao Pires",111888,"Brazil",-23.7106,-46.4133
+"Conselheiro Lafaiete",111596,"Brazil",-20.6603,-43.7861
+"Resende",111514,"Brazil",-22.4689,-44.4467
+"Santa Rosa",111424,"Argentina",-36.6167,-64.2833
+"Araucaria",111302,"Brazil",-25.5931,-49.4103
+"Atibaia",110968,"Brazil",-23.1169,-46.5503
+"Varzea Paulista",110936,"Brazil",-23.2114,-46.8283
+"Garanhuns",110085,"Brazil",-8.88202,-36.5022
+"Araruama",109637,"Brazil",-22.8728,-42.3431
+"Catanduva",109612,"Brazil",-21.1378,-48.9728
+"Tumbes",109223,"Peru",-3.56694,-80.4515
+"San Rafael",109163,"Argentina",-34.6177,-68.3301
+"Franco da Rocha",108858,"Brazil",-23.3217,-46.7269
+"El Vigia",108668,"Venezuela",8.6135,-71.657
+"Giron",108466,"Colombia",7.0682,-73.1698
+"Cabo Frio",108239,"Brazil",-22.8872,-42.0262
+"Ji Parana",107697,"Brazil",-10.8853,-61.9517
+"Araras",107463,"Brazil",-22.3569,-47.3842
+"Poa",107432,"Brazil",-23.5281,-46.3447
+"Vitoria de Santo Antao",107383,"Brazil",-8.11806,-35.2914
+"Umuarama",107319,"Brazil",-23.7664,-53.325
+"Apucarana",107085,"Brazil",-23.5508,-51.4608
+"Catia La Mar",106822,"Venezuela",10.6054,-67.0324
+"Santa Cruz do Sul",106113,"Brazil",-29.7175,-52.4258
+"Guaratingueta",105880,"Brazil",-22.8164,-45.1925
+"San Francisco De Borja",105076,"Peru",-12.0891,-76.9988
+"Linhares",105075,"Brazil",-19.3911,-40.0722
+"Alto Hospicio",105065,"Chile",-20.2687,-70.1049
+"Araguaina",105019,"Brazil",-7.19111,-48.2072
+"Tandil",104325,"Argentina",-37.3217,-59.1332
+"Lo Prado",104316,"Chile",-33.4443,-70.7255
+"Esmeraldas",103206,"Brazil",-19.7625,-44.3139
+"Cabudare",102686,"Venezuela",10.0266,-69.262
+"Curico",102438,"Chile",-34.9828,-71.2394
+"Birigui",102277,"Brazil",-21.2886,-50.34
+"Assis",101597,"Brazil",-22.6617,-50.4122
+"Malambo",101534,"Colombia",10.8595,-74.7739
+"Barretos",101220,"Brazil",-20.5572,-48.5678
+"Colatina",101190,"Brazil",-19.5394,-40.6306
+"Teofilo Otoni",101170,"Brazil",-17.8575,-41.5053
+"Guaiba",101024,"Brazil",-30.1139,-51.325
+"Guarapari",100925,"Brazil",-20.6718,-40.502
+"Coronel Fabriciano",100916,"Brazil",-19.5186,-42.6289
+"Itaguai",100752,"Brazil",-22.8522,-43.7753
+"Los Rastrojos",100497,"Venezuela",10.0259,-69.2417
+"Magangue",100313,"Colombia",9.24202,-74.7547
+"Rio das Ostras",100000,"Brazil",-22.5269,-41.945
+"Salto",99823,"Uruguay",-31.3833,-57.9667
+"Tucupita",99778,"Venezuela",9.05806,-62.05
+"Villa de Cura",99669,"Venezuela",10.0386,-67.4894
+"Itabira",99496,"Brazil",-19.6192,-43.2269
+"Votorantim",99390,"Brazil",-23.5467,-47.4378
+"Sertaozinho",99211,"Brazil",-21.1378,-47.9903
+"Talara",99074,"Peru",-4.57722,-81.2719
+"Santana de Parnaiba",98989,"Brazil",-23.4442,-46.9178
+"Bage",98940,"Brazil",-31.3314,-54.1069
+"Passos",98752,"Brazil",-20.7189,-46.6097
+"Salto",98387,"Brazil",-23.2008,-47.2869
+"Uba",97828,"Brazil",-21.12,-42.9428
+"Ourinhos",97799,"Brazil",-22.9789,-49.8706
+"Trindade",97521,"Brazil",-16.6494,-49.4889
+"Arapongas",97512,"Brazil",-23.4194,-51.4244
+"Villa Alemana",97320,"Chile",-33.0422,-71.3733
+"Villa Mercedes",96781,"Argentina",-33.6757,-65.4578
+"Araguari",96565,"Brazil",-18.6472,-48.1872
+"Corumba",96520,"Brazil",-19.0092,-57.6533
+"Limpio",96143,"Paraguay",-25.1661,-57.4856
+"Erechim",96087,"Brazil",-27.6346,-52.2754
+"San Carlos de Bariloche",95394,"Argentina",-41.1456,-71.3082
+"Japeri",95101,"Brazil",-22.6431,-43.6533
+"Vespasiano",94749,"Brazil",-19.6919,-43.9233
+"Campo Largo",94668,"Brazil",-25.4596,-49.5301
+"Nemby",94641,"Paraguay",-25.3949,-57.5357
+"Facatativa",94611,"Colombia",4.81367,-74.3545
+"Tatui",93580,"Brazil",-23.3556,-47.8569
+"Trelew",93442,"Argentina",-43.249,-65.3051
+"Rubio",93197,"Venezuela",7.70131,-72.3557
+"Coronel",92940,"Chile",-37.0339,-73.1402
+"Patos",92575,"Brazil",-7.02444,-37.28
+"Villa Maria",92453,"Argentina",-32.4075,-63.2402
+"Riohacha",92431,"Colombia",11.5444,-72.9072
+"Duitama",92040,"Colombia",5.8245,-73.0341
+"Timoteo",91722,"Brazil",-19.5811,-42.6495
+"Zipaquira",91235,"Colombia",5.02208,-74.0048
+"Muriae",91173,"Brazil",-21.1306,-42.3664
+"Cambe",91080,"Brazil",-23.2758,-51.2783
+"Bayeux",91056,"Brazil",-7.125,-34.9322
+"Bento Goncalves",90852,"Brazil",-29.1714,-51.5192

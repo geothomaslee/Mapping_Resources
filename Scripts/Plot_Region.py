@@ -13,10 +13,10 @@ from obspy import UTCDateTime
 import pygmt
 import pandas as pd
 
-min_lon = -80
-max_lon = -45
-min_lat = -50
-max_lat = -15
+min_lon = -109
+max_lon = -102
+min_lat = 31
+max_lat = 37
 projection='M15c'
 figure_name = 'Laguna Maule Regional Overview'
 file_type = 'png'
@@ -25,7 +25,7 @@ plot_holocene_volcanoes = True
 client = Client('IRIS') # Client to use for catalogging. Generally, use IRIS
 starttime=("2015-01-01") # Start time in UTC
 endtime=("2017-12-31") # End time in UTC
-networm = "ZR" # Network code
+network = "ZR" # Network code
 station = "*" # Set to * to select all stations in network
 channel_prefix ="??" # Set to * or ?? if unknown
 margin = 0.2 # Margin around the area covered by the stations
@@ -36,7 +36,7 @@ starttime = UTCDateTime(starttime)
 endtime = UTCDateTime(endtime)
 
 station_inv = client.get_stations(starttime=starttime, endtime=endtime,
-                                      network=networm, station=station,
+                                      network=network, station=station,
                                       level="channel", channel=channels)
 
 station_lats = []
@@ -66,8 +66,11 @@ holocene_vol_lat_list = holo_volc_df['Latitude'].tolist()
 
 
 fig = pygmt.Figure()
+
+
 fig.basemap(region=region,
-             projection=projection)
+             projection=projection,
+             frame=True)
 fig.grdimage(grid=grid,
              projection=projection,
              frame=["a",f'+t{figure_name}'],
@@ -86,7 +89,10 @@ fig.plot(x=(sum(station_lons) / len(station_lons)),
          style='a1c',
          fill='yellow')
 
+
+
 fig.show()
+
 
 FILENAME = figure_name.replace(' ','_')
 FILENAME += f'_Map.{file_type}'

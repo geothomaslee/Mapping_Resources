@@ -40,15 +40,6 @@ def find_multi_network(deployment_list,client="IRIS"):
             station_inv += secondary_inv
             
     return station_inv
-            
-      
-station_inv = find_stations("ZR","2015-01-01","2017-12-31")
-station_inv.plot()
-        
-deployment_list = [["ZR","2015-01-01","2017-12-31"]]
-
-station_inv = find_multi_network(deployment_list)
-station_inv.plot()
 
 def get_coordinates_from_network(network):
     lat_list = []
@@ -106,23 +97,34 @@ def get_map_bounds(lats,lons,margin=0.1):
     
     return bounds
 
-def plot_stations:
+def plot_stations(bounds,projection="Q15c+du",figure_name="figure!"):
+    
+    grid = pygmt.datasets.load_earth_relief(resolution="03s", region=bounds)
+    
     fig = pygmt.Figure()
-    fig.basemap(region=region,
-                 projection=PROJECTION)
+    fig.basemap(region=bounds,
+                projection=projection,
+                frame=True)
     fig.grdimage(grid=grid,
-                 projection=PROJECTION,
-                 frame=["a",f'+t{FIGURE_NAME}'],
+                 projection=projection,
+                 frame=["a",f'+t{figure_name}'],
                  cmap='dem2')
     fig.coast(shorelines="4/0.5p,black",
-              projection=PROJECTION,
+              projection=projection,
               borders="1/1.2p,black",
               water="skyblue",
               resolution="f")
     
-plot)stations
+    return fig
+    
+def plot_inventory(inventory):
+    lats, lons, elevs = get_coordinate_list(inventory)
+    bounds = get_map_bounds(lats,lons)
+    fig = plot_stations(bounds)
+    fig.show()
     
 
-        
-        
-        
+deployment_list = [["ZR","2015-01-01","2017-12-31"]]
+station_inv = find_multi_network(deployment_list)
+ 
+plot_inventory(station_inv)

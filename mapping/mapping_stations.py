@@ -14,10 +14,19 @@ def find_stations(network, starttime,endtime,station='*',client="IRIS"):
                                               endtime=endtime,
                                               network=network, 
                                               station=station,
-                                              level="station")
+                                              level="station",)
     return station_inv
 
-def find_multi_network(deployment_list,client="IRIS"):
+def find_multi_network(deployment_list,bounds,client="IRIS"):
+    
+    if len(bounds) != 4:
+        raise ValueError(f'Expected 4 items in bounds, got {len(bounds)}')
+        
+    minlon = bounds[0]
+    maxlon = bounds[1]
+    minlat = bounds[2]
+    maxlat = bounds[3]
+    
     working_client = Client(client)
     for i, deployment in enumerate(deployment_list):
         network = deployment[0]
@@ -29,13 +38,21 @@ def find_multi_network(deployment_list,client="IRIS"):
                                                       endtime=endtime,
                                                       network=network, 
                                                       station='*',
-                                                      level="station")
+                                                      level="station",
+                                                      minlatitude=minlat,
+                                                      maxlatitude=maxlat,
+                                                      minlongitude=minlon,
+                                                      maxlongitude=maxlon)
         else:
             secondary_inv = working_client.get_stations(starttime=starttime,
                                                         endtime=endtime,
                                                         network=network, 
                                                         station='*',
-                                                        level="station")
+                                                        level="station",
+                                                        minlatitude=minlat,
+                                                        maxlatitude=maxlat,
+                                                        minlongitude=minlon,
+                                                        maxlongitude=maxlon)
             station_inv += secondary_inv
             
     return station_inv
@@ -96,9 +113,12 @@ def get_map_bounds(lats,lons,margin=0.1):
     
     return bounds
 
-def plot_stations(bounds,projection="Q15c+du",figure_name="figure!"):
+def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",resolution='15s'):
     
-    grid = pygmt.datasets.load_earth_relief(resolution="03s", region=bounds)
+    lats,lons,elevs = get_coordinate_list(inventory)
+    bounds = get_map_bounds(lats,lons)
+    
+    grid = pygmt.datasets.load_earth_relief(resolution=resolution, region=bounds)
     
     fig = pygmt.Figure()
     fig.basemap(region=bounds,
@@ -107,23 +127,33 @@ def plot_stations(bounds,projection="Q15c+du",figure_name="figure!"):
     fig.grdimage(grid=grid,
                  projection=projection,
                  frame=["a",f'+t{figure_name}'],
-                 cmap='dem2')
+                 cmap='geo')
     fig.coast(shorelines="4/0.5p,black",
+              rivers="1/05p,blue",
               projection=projection,
-              borders="1/1.2p,black",
+              borders="2/1.2p,black",
               water="skyblue",
               resolution="f")
+    
+    colors = ["cyan","yellow","green","blue","purple","orange"]
+    for i, network in enumerate(inventory):
+        lats,lons,elevs = get_coordinates_from_network(network)
+        fig.plot(x=lons,
+                 y=lats,
+                 style="t0.35c",
+                 fill=colors[i],
+                 pen="0.2p")
     
     return fig
     
 def plot_inventory(inventory):
     lats, lons, elevs = get_coordinate_list(inventory)
-    bounds = get_map_bounds(lats,lons)
-    fig = plot_stations(bounds)
+    fig = plot_stations(inventory)
     fig.show()
     
 
-deployment_list = [["ZR","2015-01-01","2017-12-31"]]
-station_inv = find_multi_network(deployment_list)
+deployment_list = [["UW","2015-01-01","2017-12-31"],["XU","2007-01-01","2011-12-31"]]
+bounds = [-123, -120, 45, 47.5]
+station_inv = find_multi_network(deployment_list,bounds)
  
 plot_inventory(station_inv)

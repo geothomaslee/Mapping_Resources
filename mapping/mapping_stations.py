@@ -2,10 +2,9 @@
 """
 Created on Tue Nov  7 15:05:26 2023
 
-@author: Blumenwitz
+@author: tlee
 """
 
-import obspy
 from obspy.clients.fdsn import Client
 import pygmt
 

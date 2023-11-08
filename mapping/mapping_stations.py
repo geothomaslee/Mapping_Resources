@@ -9,6 +9,26 @@ from obspy.clients.fdsn import Client
 import pygmt
 
 def find_stations(network, starttime,endtime,station='*',client="IRIS"):
+    """
+    Parameters
+    ----------
+    network : string
+        Network name.
+    starttime : string
+        Starttime formattted as yyyy-mm-ddT00.00.00.000. Can exclude T.
+    endtime : string
+        Endtime formatted as yyyy-mm-ddT00.00.00.000. Can exclude T.
+    station : string, optional
+        Glob compatible station selection. The default is '*'.
+    client : string, optional
+        Data host. If unsure use default. The default is "IRIS".
+
+    Returns
+    -------
+    station_inv : obspy.core.inventory.Inventory
+        ObsPy inventory object containing the selected stations.
+
+    """
     working_client = Client(client)
     station_inv = working_client.get_stations(starttime=starttime,
                                               endtime=endtime,
@@ -18,6 +38,23 @@ def find_stations(network, starttime,endtime,station='*',client="IRIS"):
     return station_inv
 
 def find_multi_network(deployment_list,bounds,client="IRIS"):
+    """
+    Parameters
+    ----------
+    deployment_list : list of lists of strings
+        List of lists, each sublist containing 3 or 4 strings giving information
+        for the deployment. Requires network, starttime, endtime, station, in
+        that order. See find_stations for details
+    bounds : list of ints or floats
+        Region to search for stations, in order [minlon, maxlon, minlat, maxlat]
+    client : string, optional
+        Data host. If unsure use default. The default is "IRIS".
+        
+    Returns
+    -------
+    station_inv : obspy.core.inventory.Inventory
+        ObsPy inventory object containing the stations.
+    """
     
     if len(bounds) != 4:
         raise ValueError(f'Expected 4 items in bounds, got {len(bounds)}')
@@ -65,6 +102,22 @@ def find_multi_network(deployment_list,bounds,client="IRIS"):
     return station_inv
 
 def get_coordinates_from_network(network):
+    """
+    Parameters
+    ----------
+    network : obspy.core.network.Network
+        ObsPy network object containing the stations.
+
+    Returns
+    -------
+    lat_list : list
+        List of latitudes.
+    lon_list : list
+        List of longitudes.
+    elev_list : list
+        List of elevations.
+
+    """
     lat_list = []
     lon_list = []
     elev_list = []
@@ -77,6 +130,23 @@ def get_coordinates_from_network(network):
     return lat_list, lon_list, elev_list
     
 def get_coordinate_list(inventory):
+    """
+    Parameters
+    ----------
+    inventory : obspy.core.inventory.Inventory
+        ObsPy inventory object containing the network(s).
+
+    Reeturns
+    -------
+    lat_list : list
+        List of latitudes.
+    lon_list : list
+        List of longitudes.
+    elev_list : list
+        List of elevations.
+
+    """
+    
     lat_list = []
     lon_list = []
     elev_list = []
@@ -121,6 +191,21 @@ def get_map_bounds(lats,lons,margin=0.1):
     return bounds
 
 def get_marginal_bounds(bounds,margin=0.1):
+    """
+    Parameters
+    ----------
+    bounds : list of ints or floats
+        Region to search for stations, in order [minlon, maxlon, minlat, maxlat]
+    margin : int or float, optional
+        Margin size, multiplied by the length of the bounds. 0.1 = 10% margin. 
+        The default is 0.1.
+
+    Returns
+    -------
+    marginal_bounds : list of ints or floats
+        New bounds with added margin, same format as input bounds.
+
+    """
     lons = [bounds[0],bounds[1]]
     lats = [bounds[2],bounds[3]]
             
@@ -137,11 +222,70 @@ def get_marginal_bounds(bounds,margin=0.1):
     marginal_bounds = [min_lon, max_lon, min_lat, max_lat]
     
     return marginal_bounds
+
+def plot_bounding_box(fig, bounds):
+    """
+    Parameters
+    ----------
+    fig : pygmt.Figure
+        PyGMT figure to draw on.
+    bounds : list of ints or floats
+        Region to search for stations, in order [minlon, maxlon, minlat, maxlat]
+
+    Returns
+    -------
+    fig : pygmt.Figure
+        Input figure with box added.
+    """
+    
+    if len(bounds) != 4:
+        raise ValueError(f'Expected 4 items in bounds, got {len(bounds)}')
+        
+    minlon = bounds[0]
+    maxlon = bounds[1]
+    minlat = bounds[2]
+    maxlat = bounds[3]
+    
+    lats = [minlat, maxlat, maxlat, minlat, minlat]
+    lons = [minlon, minlon, maxlon, maxlon, minlon]
+    
+    fig.plot(x=lons,
+             y=lats,
+             pen="1p")
+    
+    return fig
     
 
 def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",
                   resolution='03s',region=None,
-                  cmap="../Resources/colormaps/colombia.cpt"):
+                  cmap="../Resources/colormaps/colombia.cpt",
+                  box_bounds=None):
+    """
+    Parameters
+    ----------
+    inventory : obspy.core.inventory.Inventory
+        ObsPy inventory containing the stations to plot.
+    projection : string, optional
+        GMT flag for specifying projection. The default is "Q15c+du".
+    figure_name : string, optional
+        Title for figure. The default is "figure!".
+    resolution : int, optional
+        Resolution of the topographic data to be loaded. The default is '03s'.
+        See PyGMT.load_earth_relief for more options.
+    region : list of ints or floats, optional
+        Region to plot, in order [minlon, maxlon, minlat, maxlat]
+    cmap : TYPE, optional
+        DESCRIPTION. The default is "../Resources/colormaps/colombia.cpt".
+    box_bounds : list of ints or floats, optional
+        Region to draw a box around, in order [minlon, maxlon, minlat, maxlat].
+        If none is set, no box will be drawn
+
+    Returns
+    -------
+    fig : pygmt.Figure
+        PyGMT figure with plotted data.
+
+    """
     
     lats,lons,elevs = get_coordinate_list(inventory)
     
@@ -175,33 +319,39 @@ def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",
                  y=lats,
                  style="t0.4c",
                  fill=colors[i],
+                 label=network.code,
                  pen="0.2p")
+        
+    if box_bounds != None:
+        if len(bounds) != 4:
+            raise ValueError(f'Expected 4 items in box_bounds, got {len(box_bounds)}')
+            
+        bminlon = box_bounds[0]
+        bmaxlon = box_bounds[1]
+        bminlat = box_bounds[2]
+        bmaxlat = box_bounds[3]
+        
+        blats = [bminlat, bmaxlat, bmaxlat, bminlat, bminlat]
+        blons = [bminlon, bminlon, bmaxlon, bmaxlon, bminlon]
+        
+        fig.plot(x=blons,
+                 y=blats,
+                 pen="1p")    
+        
+    fig.legend()
     
     return fig
 
-def plot_bounding_box(fig, bounds):
-    if len(bounds) != 4:
-        raise ValueError(f'Expected 4 items in bounds, got {len(bounds)}')
-        
-    minlon = bounds[0]
-    maxlon = bounds[1]
-    minlat = bounds[2]
-    maxlat = bounds[3]
-    
-    lats = [minlat, maxlat, maxlat, minlat, minlat]
-    lons = [minlon, minlon, maxlon, maxlon, minlon]
-    
-    fig.plot(x=lons,
-             y=lats,
-             pen="1p")
-    
-    return fig
+
 
 def save_fig(fig,name,dpi=720,ftype="png"):
     fname = name + "." + ftype
     print(fname)
     fig.savefig(fname=fname,
                 dpi=dpi)
+    
+    
+    
 
 deployment_list = [["UW","2015-01-01","2017-12-31"],["XU","2007-01-01","2011-12-31"],
                    ["XD","2014-01-01","2016-12-31","M*"],["TA","2006-01-01","2023-11-6"],
@@ -215,13 +365,12 @@ station_inv = find_multi_network(deployment_list,region_bounds)
 
 fig = plot_stations(station_inv,
                     figure_name="Rainier Region Seismic Stations",
-                    cmap="../Resources/colormaps/colombia.cpt")
-fig_box = plot_bounding_box(fig, box_bounds)
-fig_box.show()
-#save_fig(fig_box,"Regional_Stations")
+                    box_bounds=box_bounds)
+fig.show()
+save_fig(fig,"Regional_Stations")
 
 fig2 = plot_stations(station_inv,region=box_bounds,
-                     figure_name="Stations within Bounding Box")
-fig2_box = plot_bounding_box(fig2, box_bounds)
-fig2_box.show()
-#save_fig(fig2_box,"Local_View_Stations")
+                     figure_name="Stations within Bounding Box",
+                     box_bounds=box_bounds)
+fig2.show()
+save_fig(fig2,"Local_View_Stations")

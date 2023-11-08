@@ -258,7 +258,7 @@ def plot_bounding_box(fig, bounds):
 
 def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",
                   resolution='03s',region=None,
-                  cmap="../Resources/colormaps/colombia.cpt",
+                  cmap="./Resources/colormaps/colombia.cpt",
                   box_bounds=None):
     """
     Parameters
@@ -342,35 +342,27 @@ def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",
     
     return fig
 
-
-
 def save_fig(fig,name,dpi=720,ftype="png"):
+    """
+    Parameters
+    ----------
+    fig : pygmt.Figure
+        Figure to save.
+    name : string
+        Name of file.
+    dpi : int, optional
+        DPI of figure. The default is 720.
+    ftype : string, optional
+        File extension, without the period. Will automatically save as the correct
+        file type. The default is "png".
+
+    Returns
+    -------
+    None.
+
+    """
     fname = name + "." + ftype
     print(fname)
     fig.savefig(fname=fname,
                 dpi=dpi)
     
-    
-    
-
-deployment_list = [["UW","2015-01-01","2017-12-31"],["XU","2007-01-01","2011-12-31"],
-                   ["XD","2014-01-01","2016-12-31","M*"],["TA","2006-01-01","2023-11-6"],
-                   #["YW","2005-08-11","2005-12-31"],
-                   ["CC","2020-10-22","2023-11-7"],["NP","2013-01-01","2013-01-02"]
-                   ]
-region_bounds = [-122, -120.5, 45.6, 47.25]
-box_bounds = [-122, -121, 46.35, 47.1]
-
-station_inv = find_multi_network(deployment_list,region_bounds)
-
-fig = plot_stations(station_inv,
-                    figure_name="Rainier Region Seismic Stations",
-                    box_bounds=box_bounds)
-fig.show()
-save_fig(fig,"Regional_Stations")
-
-fig2 = plot_stations(station_inv,region=box_bounds,
-                     figure_name="Stations within Bounding Box",
-                     box_bounds=box_bounds)
-fig2.show()
-save_fig(fig2,"Local_View_Stations")

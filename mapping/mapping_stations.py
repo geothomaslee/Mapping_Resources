@@ -33,11 +33,18 @@ def find_multi_network(deployment_list,bounds,client="IRIS"):
         starttime = deployment[1]
         endtime = deployment[2]
         
+        if len(deployment) == 3:
+            stations = "*"
+        elif len(deployment) == 4:
+            stations = deployment[3]
+        else:
+            raise ValueError("Expected 3 or 4 arguments for network {network}, got {len(deployment})")
+        
         if i < 1:
             station_inv = working_client.get_stations(starttime=starttime,
                                                       endtime=endtime,
                                                       network=network, 
-                                                      station='*',
+                                                      station=stations,
                                                       level="station",
                                                       minlatitude=minlat,
                                                       maxlatitude=maxlat,
@@ -47,7 +54,7 @@ def find_multi_network(deployment_list,bounds,client="IRIS"):
             secondary_inv = working_client.get_stations(starttime=starttime,
                                                         endtime=endtime,
                                                         network=network, 
-                                                        station='*',
+                                                        station=stations,
                                                         level="station",
                                                         minlatitude=minlat,
                                                         maxlatitude=maxlat,
@@ -129,7 +136,7 @@ def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",resolutio
                  frame=["a",f'+t{figure_name}'],
                  cmap='geo')
     fig.coast(shorelines="4/0.5p,black",
-              rivers="1/05p,blue",
+              rivers="1/2p,blue",
               projection=projection,
               borders="2/1.2p,black",
               water="skyblue",
@@ -140,7 +147,7 @@ def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",resolutio
         lats,lons,elevs = get_coordinates_from_network(network)
         fig.plot(x=lons,
                  y=lats,
-                 style="t0.35c",
+                 style="t0.4c",
                  fill=colors[i],
                  pen="0.2p")
     
@@ -164,9 +171,13 @@ def plot_bounding_box(fig, bounds):
     
     return fig
 
-deployment_list = [["UW","2015-01-01","2017-12-31"],["XU","2007-01-01","2011-12-31"]]
-region_bounds = [-122.5, -119.5, 45.5, 47]
-box_bounds = [-122, -121, 45.5, 47]
+deployment_list = [["UW","2015-01-01","2017-12-31"],["XU","2007-01-01","2011-12-31"],
+                   ["XD","2014-01-01","2016-12-31","M*"],["TA","2006-01-01","2023-11-6"],
+                   #["YW","2005-08-11","2005-12-31"],
+                   ["CC","2020-10-22","2023-11-7"],["NP","2013-01-01","2013-01-02"]
+                   ]
+region_bounds = [-122, -120.5, 45.6, 47.25]
+box_bounds = [-122, -121, 46.35, 47.1]
 
 station_inv = find_multi_network(deployment_list,region_bounds)
 

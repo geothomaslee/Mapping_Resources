@@ -143,6 +143,7 @@ def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",resolutio
               resolution="f")
     
     colors = ["cyan","yellow","green","blue","purple","orange"]
+
     for i, network in enumerate(inventory):
         lats,lons,elevs = get_coordinates_from_network(network)
         fig.plot(x=lons,
@@ -150,6 +151,7 @@ def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",resolutio
                  style="t0.4c",
                  fill=colors[i],
                  pen="0.2p")
+        fig.legend()
     
     return fig
 

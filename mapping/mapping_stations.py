@@ -120,7 +120,7 @@ def get_map_bounds(lats,lons,margin=0.1):
     
     return bounds
 
-def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",resolution='15s'):
+def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",resolution='30s'):
     
     lats,lons,elevs = get_coordinate_list(inventory)
     bounds = get_map_bounds(lats,lons)
@@ -142,7 +142,7 @@ def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",resolutio
               water="skyblue",
               resolution="f")
     
-    colors = ["cyan","yellow","green","blue","purple","orange"]
+    colors = ["cyan","yellow","green","blue","purple","orange","red"]
 
     for i, network in enumerate(inventory):
         lats,lons,elevs = get_coordinates_from_network(network)
@@ -151,7 +151,6 @@ def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",resolutio
                  style="t0.4c",
                  fill=colors[i],
                  pen="0.2p")
-        fig.legend()
     
     return fig
 
@@ -173,6 +172,12 @@ def plot_bounding_box(fig, bounds):
     
     return fig
 
+def save_fig(fig,name,dpi=720,ftype="png"):
+    fname = name + "." + ftype
+    print(fname)
+    fig.savefig(fname=fname,
+                dpi=dpi)
+
 deployment_list = [["UW","2015-01-01","2017-12-31"],["XU","2007-01-01","2011-12-31"],
                    ["XD","2014-01-01","2016-12-31","M*"],["TA","2006-01-01","2023-11-6"],
                    #["YW","2005-08-11","2005-12-31"],
@@ -183,6 +188,7 @@ box_bounds = [-122, -121, 46.35, 47.1]
 
 station_inv = find_multi_network(deployment_list,region_bounds)
 
-fig = plot_stations(station_inv)
+fig = plot_stations(station_inv,figure_name="Seismic Networks to be Used for Rainier Ambient Correlation Project")
 fig_box = plot_bounding_box(fig, box_bounds)
 fig_box.show()
+save_fig(fig_box,"test_fig")

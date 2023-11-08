@@ -139,7 +139,7 @@ def get_marginal_bounds(bounds,margin=0.1):
     return marginal_bounds
     
 
-def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",resolution='03s',region=None):
+def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",resolution='03s',region=None,cmap="dem2"):
     
     lats,lons,elevs = get_coordinate_list(inventory)
     
@@ -157,7 +157,7 @@ def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",resolutio
     fig.grdimage(grid=grid,
                  projection=projection,
                  frame=["a",f'+t{figure_name}'],
-                 cmap='dem2')
+                 cmap=cmap)
     fig.coast(shorelines="4/0.5p,black",
               rivers="1/2p,blue",
               projection=projection,
@@ -211,12 +211,15 @@ box_bounds = [-122, -121, 46.35, 47.1]
 
 station_inv = find_multi_network(deployment_list,region_bounds)
 
-fig = plot_stations(station_inv,figure_name="Rainier region seismic stations")
+fig = plot_stations(station_inv,
+                    figure_name="Rainier Region Seismic Stations",
+                    cmap="../Resources/colormaps/colombia.cpt""")
 fig_box = plot_bounding_box(fig, box_bounds)
 fig_box.show()
-save_fig(fig_box,"Regional_Stations")
+#save_fig(fig_box,"Regional_Stations")
 
-fig2 = plot_stations(station_inv,region=box_bounds,figure_name="Rainier region seismic stations")
-fig2_box = plot_bounding_box(fig, box_bounds)
+fig2 = plot_stations(station_inv,region=box_bounds,
+                     figure_name="Stations within Bounding Box")
+fig2_box = plot_bounding_box(fig2, box_bounds)
 fig2_box.show()
-save_fig(fig2_box,"Local_View_Stations")
+#save_fig(fig2_box,"Local_View_Stations")

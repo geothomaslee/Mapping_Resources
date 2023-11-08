@@ -139,7 +139,9 @@ def get_marginal_bounds(bounds,margin=0.1):
     return marginal_bounds
     
 
-def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",resolution='03s',region=None,cmap="dem2"):
+def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",
+                  resolution='03s',region=None,
+                  cmap="../Resources/colormaps/colombia.cpt"):
     
     lats,lons,elevs = get_coordinate_list(inventory)
     
@@ -213,7 +215,7 @@ station_inv = find_multi_network(deployment_list,region_bounds)
 
 fig = plot_stations(station_inv,
                     figure_name="Rainier Region Seismic Stations",
-                    cmap="../Resources/colormaps/colombia.cpt""")
+                    cmap="../Resources/colormaps/colombia.cpt")
 fig_box = plot_bounding_box(fig, box_bounds)
 fig_box.show()
 #save_fig(fig_box,"Regional_Stations")

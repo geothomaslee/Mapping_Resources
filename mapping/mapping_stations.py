@@ -145,15 +145,31 @@ def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",resolutio
                  pen="0.2p")
     
     return fig
+
+def plot_bounding_box(fig, bounds):
+    if len(bounds) != 4:
+        raise ValueError(f'Expected 4 items in bounds, got {len(bounds)}')
+        
+    minlon = bounds[0]
+    maxlon = bounds[1]
+    minlat = bounds[2]
+    maxlat = bounds[3]
     
-def plot_inventory(inventory):
-    lats, lons, elevs = get_coordinate_list(inventory)
-    fig = plot_stations(inventory)
-    fig.show()
+    lats = [minlat, maxlat, maxlat, minlat, minlat]
+    lons = [minlon, minlon, maxlon, maxlon, minlon]
     
+    fig.plot(x=lons,
+             y=lats,
+             pen="1p")
+    
+    return fig
 
 deployment_list = [["UW","2015-01-01","2017-12-31"],["XU","2007-01-01","2011-12-31"]]
-bounds = [-123, -120, 45, 47.5]
-station_inv = find_multi_network(deployment_list,bounds)
- 
-plot_inventory(station_inv)
+region_bounds = [-122.5, -119.5, 45.5, 47]
+box_bounds = [-122, -121, 45.5, 47]
+
+station_inv = find_multi_network(deployment_list,region_bounds)
+
+fig = plot_stations(station_inv)
+fig_box = plot_bounding_box(fig, box_bounds)
+fig_box.show()

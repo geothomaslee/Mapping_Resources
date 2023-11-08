@@ -259,7 +259,7 @@ def plot_bounding_box(fig, bounds):
 def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",
                   resolution='03s',region=None,
                   cmap="./Resources/colormaps/colombia.cpt",
-                  box_bounds=None):
+                  box_bounds=None,margin=0.1):
     """
     Parameters
     ----------
@@ -279,6 +279,9 @@ def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",
     box_bounds : list of ints or floats, optional
         Region to draw a box around, in order [minlon, maxlon, minlat, maxlat].
         If none is set, no box will be drawn
+    margin : int or float, optional
+        Margin size, multiplied by the length of the bounds. 0.1 = 10% margin. 
+        The default is 0.1.
 
     Returns
     -------
@@ -290,9 +293,9 @@ def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",
     lats,lons,elevs = get_coordinate_list(inventory)
     
     if region == None:
-        bounds = get_map_bounds(lats,lons)
+        bounds = get_map_bounds(lats,lons,margin=margin)
     else:
-        bounds = get_marginal_bounds(region)
+        bounds = get_marginal_bounds(region,margin=margin)
     
     grid = pygmt.datasets.load_earth_relief(resolution=resolution, region=bounds)
     
@@ -305,7 +308,6 @@ def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",
                  frame=["a",f'+t{figure_name}'],
                  cmap=cmap)
     fig.coast(shorelines="4/0.5p,black",
-              rivers="1/2p,blue",
               projection=projection,
               borders="2/1.2p,black",
               water="skyblue",

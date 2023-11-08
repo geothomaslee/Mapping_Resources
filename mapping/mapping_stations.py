@@ -120,10 +120,33 @@ def get_map_bounds(lats,lons,margin=0.1):
     
     return bounds
 
-def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",resolution='30s'):
+def get_marginal_bounds(bounds,margin=0.1):
+    lons = [bounds[0],bounds[1]]
+    lats = [bounds[2],bounds[3]]
+            
+    min_lon = min(lons) - (margin * abs(max(lons) - min(lons)))
+    min_lat = min(lats) - (margin * abs(max(lats) - min(lats)))
+    max_lon = max(lons) + (margin * abs(max(lons) - min(lons)))
+    max_lat = max(lats) + (margin * abs(max(lats) - min(lats)))
+    
+    min_lon = check_lon(min_lon)
+    min_lat = check_lat(min_lat)
+    max_lon = check_lon(max_lon)
+    max_lat = check_lat(max_lat)
+    
+    marginal_bounds = [min_lon, max_lon, min_lat, max_lat]
+    
+    return marginal_bounds
+    
+
+def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",resolution='03s',region=None):
     
     lats,lons,elevs = get_coordinate_list(inventory)
-    bounds = get_map_bounds(lats,lons)
+    
+    if region == None:
+        bounds = get_map_bounds(lats,lons)
+    else:
+        bounds = get_marginal_bounds(region)
     
     grid = pygmt.datasets.load_earth_relief(resolution=resolution, region=bounds)
     
@@ -134,7 +157,7 @@ def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",resolutio
     fig.grdimage(grid=grid,
                  projection=projection,
                  frame=["a",f'+t{figure_name}'],
-                 cmap='geo')
+                 cmap='dem2')
     fig.coast(shorelines="4/0.5p,black",
               rivers="1/2p,blue",
               projection=projection,
@@ -188,7 +211,12 @@ box_bounds = [-122, -121, 46.35, 47.1]
 
 station_inv = find_multi_network(deployment_list,region_bounds)
 
-fig = plot_stations(station_inv,figure_name="Seismic Networks to be Used for Rainier Ambient Correlation Project")
+fig = plot_stations(station_inv,figure_name="Rainier region seismic stations")
 fig_box = plot_bounding_box(fig, box_bounds)
 fig_box.show()
-save_fig(fig_box,"test_fig")
+save_fig(fig_box,"Regional_Stations")
+
+fig2 = plot_stations(station_inv,region=box_bounds,figure_name="Rainier region seismic stations")
+fig2_box = plot_bounding_box(fig, box_bounds)
+fig2_box.show()
+save_fig(fig2_box,"Local_View_Stations")

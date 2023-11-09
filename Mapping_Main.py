@@ -5,7 +5,7 @@ Created on Tue Nov  7 15:05:02 2023
 @author: tlee
 """
 
-import mapping.mapping_stations as ms
+import scripts.mapping_stations as ms
 
 
 deployment_list = [["UW","2015-01-01","2017-12-31"],["XU","2007-01-01","2011-12-31"],

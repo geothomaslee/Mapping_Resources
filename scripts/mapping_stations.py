@@ -281,27 +281,4 @@ def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",
     
     return fig
 
-def save_fig(fig,name,dpi=720,ftype="png"):
-    """
-    Parameters
-    ----------
-    fig : pygmt.Figure
-        Figure to save.
-    name : string
-        Name of file.
-    dpi : int, optional
-        DPI of figure. The default is 720.
-    ftype : string, optional
-        File extension, without the period. Will automatically save as the correct
-        file type. The default is "png".
-
-    Returns
-    -------
-    None.
-
-    """
-    fname = name + "." + ftype
-    print(fname)
-    fig.savefig(fname=fname,
-                dpi=dpi)
     

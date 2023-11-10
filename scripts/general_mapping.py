@@ -9,6 +9,10 @@ A set of general mapping functions that are frequently used in other, more
 specific mapping scripts.
 """
 
+import os
+
+resources_file = os.path.join(os.path.dirname(__file__),'../','resources')
+
 def check_lon(coord):
     if coord < -180:
         coord = 180 + (coord - -180)
@@ -84,6 +88,11 @@ def get_margin_from_bounds(bounds,margin=0.1):
     marginal_bounds = [min_lon, max_lon, min_lat, max_lat]
     
     return marginal_bounds
+
+def plot_holocene_volcanoes(fig):
+    holo_volc_df = pd.read_csv()
+    holocene_vol_lon_list = holo_volc_df['Longitude'].tolist()
+    holocene_vol_lat_list = holo_volc_df['Latitude'].tolist()
 
 def save_fig(fig,name,dpi=720,ftype="png"):
     """

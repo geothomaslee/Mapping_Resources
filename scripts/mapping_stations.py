@@ -7,7 +7,7 @@ Created on Tue Nov  7 15:05:26 2023
 
 from obspy.clients.fdsn import Client
 import pygmt
-from . import general_mapping as gm
+from general_mapping import general_mapping as gm
 
 def find_stations(network, starttime,endtime,station='*',client="IRIS"):
     """
@@ -275,7 +275,9 @@ def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",
         
         fig.plot(x=blons,
                  y=blats,
-                 pen="1p")    
+                 pen="1p")   
+        
+    fig = gm.plot_holocene_volanoes(fig)
         
     fig.legend()
     

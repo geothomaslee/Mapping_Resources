@@ -5,8 +5,8 @@ Created on Tue Nov  7 15:05:02 2023
 @author: tlee
 """
 
-import scripts.mapping_stations as ms
-import scripts.general_mapping as gm
+from scripts import mapping_stations as ms
+#from scripts.general_mapping import general_mapping as gm
 
 
 deployment_list = [["UW","2015-01-01","2017-12-31"],["XU","2007-01-01","2011-12-31"],

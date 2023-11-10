@@ -10,8 +10,9 @@ specific mapping scripts.
 """
 
 import os
+import pandas as pd
 
-resources_file = os.path.join(os.path.dirname(__file__),'../','resources')
+resource_folder = os.path.join(os.path.dirname(__file__),'../resources')
 
 def check_lon(coord):
     if coord < -180:
@@ -90,9 +91,17 @@ def get_margin_from_bounds(bounds,margin=0.1):
     return marginal_bounds
 
 def plot_holocene_volcanoes(fig):
-    holo_volc_df = pd.read_csv()
+    vol_file = os.path.join(resource_folder,'GVP_Volcano_List_Holocene.csv')
+    holo_volc_df = pd.read_csv(vol_file)
     holocene_vol_lon_list = holo_volc_df['Longitude'].tolist()
     holocene_vol_lat_list = holo_volc_df['Latitude'].tolist()
+    
+    fig.plot(x=holocene_vol_lon_list,
+             y=holocene_vol_lat_list,
+             style='t0.35c',
+             fill='red')
+    
+    return fig
 
 def save_fig(fig,name,dpi=720,ftype="png"):
     """

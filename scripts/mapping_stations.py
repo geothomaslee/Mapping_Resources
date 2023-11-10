@@ -7,6 +7,7 @@ Created on Tue Nov  7 15:05:26 2023
 
 from obspy.clients.fdsn import Client
 import pygmt
+from . import general_mapping as gm
 
 def find_stations(network, starttime,endtime,station='*',client="IRIS"):
     """
@@ -159,70 +160,6 @@ def get_coordinate_list(inventory):
     
     return lat_list, lon_list, elev_list
 
-def check_lon(coord):
-    """Checks if coordinates are -180 < coord < 180 and wraps if out of range"""
-    if coord < -180:
-        coord = 180 + (coord - -180)
-    elif coord > 180:
-        coord = -180 + (coord - 180)
-    return coord
-
-def check_lat(coord):
-    """Checks if latitudes are in range -90 < coordinate < 90"""
-    if coord < -90:
-        coord = -90
-    elif coord > 90:
-        coord = 90
-    return coord
-
-def get_map_bounds(lats,lons,margin=0.1):
-    min_lon = min(lons) - (margin * abs(max(lons) - min(lons)))
-    min_lat = min(lats) - (margin * abs(max(lats) - min(lats)))
-    max_lon = max(lons) + (margin * abs(max(lons) - min(lons)))
-    max_lat = max(lats) + (margin * abs(max(lats) - min(lats)))
-    
-    min_lon = check_lon(min_lon)
-    min_lat = check_lat(min_lat)
-    max_lon = check_lon(max_lon)
-    max_lat = check_lat(max_lat)
-    
-    bounds = [min_lon, max_lon, min_lat, max_lat]
-    
-    return bounds
-
-def get_marginal_bounds(bounds,margin=0.1):
-    """
-    Parameters
-    ----------
-    bounds : list of ints or floats
-        Region to search for stations, in order [minlon, maxlon, minlat, maxlat]
-    margin : int or float, optional
-        Margin size, multiplied by the length of the bounds. 0.1 = 10% margin. 
-        The default is 0.1.
-
-    Returns
-    -------
-    marginal_bounds : list of ints or floats
-        New bounds with added margin, same format as input bounds.
-
-    """
-    lons = [bounds[0],bounds[1]]
-    lats = [bounds[2],bounds[3]]
-            
-    min_lon = min(lons) - (margin * abs(max(lons) - min(lons)))
-    min_lat = min(lats) - (margin * abs(max(lats) - min(lats)))
-    max_lon = max(lons) + (margin * abs(max(lons) - min(lons)))
-    max_lat = max(lats) + (margin * abs(max(lats) - min(lats)))
-    
-    min_lon = check_lon(min_lon)
-    min_lat = check_lat(min_lat)
-    max_lon = check_lon(max_lon)
-    max_lat = check_lat(max_lat)
-    
-    marginal_bounds = [min_lon, max_lon, min_lat, max_lat]
-    
-    return marginal_bounds
-
 def plot_bounding_box(fig, bounds):
     """
     Parameters
@@ -293,9 +230,9 @@ def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",
     lats,lons,elevs = get_coordinate_list(inventory)
     
     if region == None:
-        bounds = get_map_bounds(lats,lons,margin=margin)
+        bounds = gm.get_margin_from_lat_lon(lats,lons,margin=margin)
     else:
-        bounds = get_marginal_bounds(region,margin=margin)
+        bounds = gm.get_margin_from_bounds(region,margin=margin)
     
     grid = pygmt.datasets.load_earth_relief(resolution=resolution, region=bounds)
     

@@ -6,7 +6,7 @@ Created on Tue Nov  7 15:05:02 2023
 """
 
 import scripts.mapping_stations as ms
-import mapping_helpers.test_helper as th
+
 
 deployment_list = [["UW","2015-01-01","2017-12-31"],["XU","2007-01-01","2011-12-31"],
                    ["XD","2014-01-01","2016-12-31","M*"],["TA","2006-01-01","2023-11-6"],
@@ -18,6 +18,7 @@ region_bounds = [-122.5, -120.5, 45, 47.25]
 box_bounds = [-122.5, -120.9, 46.1, 47.3]
 
 station_inv = ms.find_multi_network(deployment_list,region_bounds)
+
 
 # Plotting a regional overview
 regional_fig = ms.plot_stations(station_inv,
@@ -40,5 +41,3 @@ fig2 = ms.plot_stations(station_inv,region=box_bounds,
                         box_bounds=box_bounds)
 fig2.show()
 ms.save_fig(fig2,"Local_View_Stations")
-
-th.test_func('yo')

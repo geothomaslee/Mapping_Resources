@@ -25,7 +25,7 @@ regional_fig = ms.plot_stations(station_inv,
                                 resolution="01m",
                                 margin=1)
 regional_fig.show()
-#gm.save_fig(regional_fig,"PNW Regional Overview")
+gm.save_fig(regional_fig,"PNW Regional Overview")
      
 # Plotting a narrower regional interview        
 rainier_region_fig = ms.plot_stations(station_inv,
@@ -33,7 +33,7 @@ rainier_region_fig = ms.plot_stations(station_inv,
                                       box_bounds=box_bounds)
                        
 rainier_region_fig.show()
-#gm.save_fig(rainier_region_fig,"Regional_Stations")
+gm.save_fig(rainier_region_fig,"Regional_Stations")
 
 # Plotting the bounding box
 local_fig = ms.plot_stations(station_inv,region=box_bounds,
@@ -41,4 +41,4 @@ local_fig = ms.plot_stations(station_inv,region=box_bounds,
                              box_bounds=box_bounds)
                         
 local_fig.show()
-#gm.save_fig(local_fig,"Local_View_Stations")
+gm.save_fig(local_fig,"Local_View_Stations")

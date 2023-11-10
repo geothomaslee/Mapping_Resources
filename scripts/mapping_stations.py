@@ -7,7 +7,7 @@ Created on Tue Nov  7 15:05:26 2023
 
 from obspy.clients.fdsn import Client
 import pygmt
-from general_mapping import general_mapping as gm
+
 
 def find_stations(network, starttime,endtime,station='*',client="IRIS"):
     """

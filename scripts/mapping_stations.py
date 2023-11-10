@@ -7,6 +7,7 @@ Created on Tue Nov  7 15:05:26 2023
 
 from obspy.clients.fdsn import Client
 import pygmt
+import scripts.general_mapping as gm
 
 
 def find_stations(network, starttime,endtime,station='*',client="IRIS"):
@@ -196,7 +197,8 @@ def plot_bounding_box(fig, bounds):
 def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",
                   resolution='03s',region=None,
                   cmap="./Resources/colormaps/colombia.cpt",
-                  box_bounds=None,margin=0.1):
+                  box_bounds=None,margin=0.1,
+                  plot_holo_vol=False):
     """
     Parameters
     ----------
@@ -276,8 +278,9 @@ def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",
         fig.plot(x=blons,
                  y=blats,
                  pen="1p")   
-        
-    fig = gm.plot_holocene_volanoes(fig)
+    
+    if plot_holo_vol == True:
+        fig = gm.plot_holocene_volcanoes(fig)
         
     fig.legend()
     

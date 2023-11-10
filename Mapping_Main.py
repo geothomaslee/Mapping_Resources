@@ -6,6 +6,7 @@ Created on Tue Nov  7 15:05:02 2023
 """
 
 import scripts.mapping_stations as ms
+import scripts.general_mapping as gm
 
 
 deployment_list = [["UW","2015-01-01","2017-12-31"],["XU","2007-01-01","2011-12-31"],
@@ -27,17 +28,18 @@ regional_fig = ms.plot_stations(station_inv,
                                 resolution="01m",
                                 margin=1)
 regional_fig.show()
+gm.save_fig(regional_fig,"PNW Regional Overview")
      
 # Plotting a narrower regional interview        
 fig = ms.plot_stations(station_inv,
                        figure_name="Rainier Region Seismic Stations",
                        box_bounds=box_bounds)
 fig.show()
-ms.save_fig(fig,"Regional_Stations")
+gm.save_fig(fig,"Regional_Stations")
 
 # Plotting the bounding box
 fig2 = ms.plot_stations(station_inv,region=box_bounds,
                         figure_name="Stations within Bounding Box",
                         box_bounds=box_bounds)
 fig2.show()
-ms.save_fig(fig2,"Local_View_Stations")
+gm.save_fig(fig2,"Local_View_Stations")

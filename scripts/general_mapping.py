@@ -84,3 +84,27 @@ def get_margin_from_bounds(bounds,margin=0.1):
     marginal_bounds = [min_lon, max_lon, min_lat, max_lat]
     
     return marginal_bounds
+
+def save_fig(fig,name,dpi=720,ftype="png"):
+    """
+    Parameters
+    ----------
+    fig : pygmt.Figure
+        Figure to save.
+    name : string
+        Name of file.
+    dpi : int, optional
+        DPI of figure. The default is 720.
+    ftype : string, optional
+        File extension, without the period. Will automatically save as the correct
+        file type. The default is "png".
+
+    Returns
+    -------
+    None.
+
+    """
+    fname = name + "." + ftype
+    print(fname)
+    fig.savefig(fname=fname,
+                dpi=dpi)

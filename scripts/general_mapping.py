@@ -263,7 +263,8 @@ def get_map_dimensions(fig):
 
 def plot_major_cities(fig,bounds=None,minpopulation=100000,
                       fontsize=14,offset=0.02,
-                      dot_color='black',label_color='black'):
+                      dot_color='black',label_color='black',
+                      close_threshhold = 0.005):
     """
     Parameters
     ----------
@@ -280,8 +281,11 @@ def plot_major_cities(fig,bounds=None,minpopulation=100000,
         The default is 0.02.
     dot_color : string, optional
         Color of dots for cities. The default is 'black'.
-    label_color : TYPE, optional
+    label_color : string, optional
         Color of city labels. The default is 'black'.
+    close_threshhold: float, optional
+        Distance, as a fraction of the length of the figure diagonal, below
+        which two very close cities will only plot the larger of the two.
 
     Returns
     -------
@@ -309,14 +313,13 @@ def plot_major_cities(fig,bounds=None,minpopulation=100000,
         city = [row['lat'],row['lng'],row['city_ascii'],row['population']]
         city_list.append(city)
         
+    print(city_list)    
+        
     height,width,diag = get_map_dimensions(fig)
-    print(diag)
-    threshhold_distance = diag * 0.005 
-    
-    print(f'Threshhold distance: {threshhold_distance}')
+    threshhold_distance = diag * close_threshhold 
     
     num_cities = len(city_list)
-    last_city_index = num_cities - 1
+    last_city_index = num_cities
     problem_pair_list = []
 
     for i, city in enumerate(city_list):
@@ -328,39 +331,52 @@ def plot_major_cities(fig,bounds=None,minpopulation=100000,
             lon2 = city2[1]
             
             distance = (((lat1-lat2) **2) + (lon1-lon2) **2) **0.5
-            
             if distance < threshhold_distance:
                 problem_pair = [i, index]
                 problem_pair_list.append(problem_pair)
                 
-    print('These cities are too close:')
+    print('WARNING: These cities are too close:')
     for pair in problem_pair_list:
         
         prob1 = pair[0]
         prob2 = pair[1]
         
         print(f'{city_list[prob1][2]} and {city_list[prob2][2]}')
+    print('The larger of the two cities will be plotted. Decrease close_threshhold to change this behavior')
 
+    to_remove_list = []
     for pair in problem_pair_list:
         prob1 = pair[0]
         prob2 = pair[1]
-        
+    
+        # If you're getting an error here with index out of bound, it's because
+        # your close_threshhold is too high and too many cities are being
+        # removed, which makes this script very confused.
         if city_list[prob1][3] > city_list[prob2][3]:
-            del city_list[prob2]
+            to_remove_list.append(city_list[prob2])
         else:
-            del city_list[prob1]
+            to_remove_list.append(city_list[prob1])
+         
+    city_list = [e for e in city_list if e not in to_remove_list]
             
     standard_offset_height = height * offset
      
-    for city in city_list:          
+    for city in city_list:  
         fig.plot(x=city[1],
                  y=city[0],
                  style='c0.35',
                  fill=dot_color,
                  label=city[2])
         
+        # Fixes labels near the map edge from going off map
+        
+        if max_lat - city[0] <= standard_offset_height:
+            label_y_val = city[0] - standard_offset_height
+        else:
+            label_y_val = city[0] + standard_offset_height
+            
         fig.text(x=city[1],
-                 y=city[0] + standard_offset_height,
+                 y=label_y_val,
                  text=city[2],
                  font=f'{fontsize}p,Helvetica-Bold,{label_color}')
         

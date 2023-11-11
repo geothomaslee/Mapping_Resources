@@ -161,7 +161,7 @@ def plot_major_cities(fig,bounds,minpopulation=100000):
                  style='c0.35',
                  fill='black',
                  label=row['city_ascii'])
-    fig.legend()
+
     return fig
 
 def save_fig(fig,name,dpi=720,ftype="png"):

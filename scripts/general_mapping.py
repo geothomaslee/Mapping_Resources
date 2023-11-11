@@ -287,6 +287,11 @@ def plot_major_cities(fig,bounds=None,minpopulation=100000,
     close_threshhold: float, optional
         Distance, as a fraction of the length of the figure diagonal, below
         which two very close cities will only plot the larger of the two.
+    hor_offset_multiplier: float, optional
+        For cities that are near the longitudinal boundaries, their label will
+        be shifted inward. This multiplier chooses how far in they will be shifted,
+        and will need to be adjusted depending on your font size and the length
+        of your longest city name that needs adjusting.
 
     Returns
     -------
@@ -314,8 +319,6 @@ def plot_major_cities(fig,bounds=None,minpopulation=100000,
         city = [row['lat'],row['lng'],row['city_ascii'],row['population']]
         city_list.append(city)
         
-    print(city_list)    
-        
     height,width,diag = get_map_dimensions(fig)
     threshhold_distance = diag * close_threshhold 
     
@@ -336,29 +339,34 @@ def plot_major_cities(fig,bounds=None,minpopulation=100000,
                 problem_pair = [i, index]
                 problem_pair_list.append(problem_pair)
                 
-    print('WARNING: These cities are too close:')
-    for pair in problem_pair_list:
+    if len(problem_pair_list) > 0: 
+        if len(problem_pair_list) <= 5:           
+            print('WARNING: These cities are too close:')
+            for pair in problem_pair_list:
         
-        prob1 = pair[0]
-        prob2 = pair[1]
-        
-        print(f'{city_list[prob1][2]} and {city_list[prob2][2]}')
-    print('The larger of the two cities will be plotted. Decrease close_threshhold to change this behavior')
-
-    to_remove_list = []
-    for pair in problem_pair_list:
-        prob1 = pair[0]
-        prob2 = pair[1]
-    
-        # If you're getting an error here with index out of bound, it's because
-        # your close_threshhold is too high and too many cities are being
-        # removed, which makes this script very confused.
-        if city_list[prob1][3] > city_list[prob2][3]:
-            to_remove_list.append(city_list[prob2])
+                prob1 = pair[0]
+                prob2 = pair[1]
+                
+                print(f'{city_list[prob1][2]} and {city_list[prob2][2]}')
+            print('The larger of the two cities will be plotted. Decrease close_threshhold to change this behavior')
         else:
-            to_remove_list.append(city_list[prob1])
-         
-    city_list = [e for e in city_list if e not in to_remove_list]
+            print('Warning: more than 5 cities are too close')
+            print('The largest of these cities will be plotted. Decrease close_threshhold to change this behavior')
+    
+        to_remove_list = []
+        for pair in problem_pair_list:
+            prob1 = pair[0]
+            prob2 = pair[1]
+        
+            # If you're getting an error here with index out of bound, it's because
+            # your close_threshhold is too high and too many cities are being
+            # removed, which makes this script very confused.
+            if city_list[prob1][3] > city_list[prob2][3]:
+                to_remove_list.append(city_list[prob2])
+            else:
+                to_remove_list.append(city_list[prob1])
+             
+        city_list = [e for e in city_list if e not in to_remove_list]
             
     standard_offset_height = height * offset
     standard_offset_width = width * offset * hor_offset_multiplier

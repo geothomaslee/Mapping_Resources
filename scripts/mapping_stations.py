@@ -272,6 +272,8 @@ def plot_stations(inventory,fig=None,projection="Q15c+du",figure_name="figure!",
                  label=network.code,
                  pen="0.2p")
         
+    fig.legend()
+        
     if box_bounds != None:
         if len(bounds) != 4:
             raise ValueError(f'Expected 4 items in box_bounds, got {len(box_bounds)}')

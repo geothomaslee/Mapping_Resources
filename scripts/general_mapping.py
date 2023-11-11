@@ -262,9 +262,10 @@ def get_map_dimensions(fig):
     return height,width,diag
 
 def plot_major_cities(fig,bounds=None,minpopulation=100000,
-                      fontsize=14,offset=0.02,
+                      fontsize=14,offset=0.02,dotsize=0.35,
                       dot_color='black',label_color='black',
-                      close_threshhold = 0.005):
+                      close_threshhold = 0.005,
+                      hor_offset_multiplier=3.5):
     """
     Parameters
     ----------
@@ -360,11 +361,12 @@ def plot_major_cities(fig,bounds=None,minpopulation=100000,
     city_list = [e for e in city_list if e not in to_remove_list]
             
     standard_offset_height = height * offset
+    standard_offset_width = width * offset * hor_offset_multiplier
      
     for city in city_list:  
         fig.plot(x=city[1],
                  y=city[0],
-                 style='c0.35',
+                 style=f'c{dotsize}',
                  fill=dot_color,
                  label=city[2])
         
@@ -374,8 +376,17 @@ def plot_major_cities(fig,bounds=None,minpopulation=100000,
             label_y_val = city[0] - standard_offset_height
         else:
             label_y_val = city[0] + standard_offset_height
+        
+        if abs(max_lon - city[1]) <= standard_offset_width:
+            label_x_val = city[1] - standard_offset_width
+            label_y_val = city[0]
+        elif abs(min_lon - city[1]) <= standard_offset_width:
+            label_x_val = city[1] + standard_offset_width
+            label_y_val = city[0]
+        else:
+            label_x_val = city[1]
             
-        fig.text(x=city[1],
+        fig.text(x=label_x_val,
                  y=label_y_val,
                  text=city[2],
                  font=f'{fontsize}p,Helvetica-Bold,{label_color}')

@@ -18,17 +18,14 @@ box_bounds = [-122.5, -120.9, 46.1, 47.3]
 station_inv = ms.find_multi_network(deployment_list,region_bounds)
 
 large_region_bounds = gm.get_margin_from_bounds(region_bounds,1.5)
-test_fig = gm.plot_base_map(large_region_bounds,resolution='15s')
-test_fig = gm.plot_major_cities(test_fig,minpopulation=300000)
-test_fig.show()
 
-"""
 # Plotting a regional overview
 regional_fig = ms.plot_stations(station_inv,
                                 figure_name="Rainier Region Seismic Stations",
                                 box_bounds=box_bounds,
                                 resolution="01m",
                                 margin=1)
+regional_fig = gm.plot_major_cities(regional_fig,minpopulation=300000)
 regional_fig.show()
 gm.save_fig(regional_fig,"PNW Regional Overview")
      
@@ -47,4 +44,3 @@ local_fig = ms.plot_stations(station_inv,region=box_bounds,
                         
 local_fig.show()
 gm.save_fig(local_fig,"Local_View_Stations")
-"""

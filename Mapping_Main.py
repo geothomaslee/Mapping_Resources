@@ -25,7 +25,7 @@ regional_fig = ms.plot_stations(station_inv,
                                 margin=1)
 
 regional_fig = gm.plot_major_cities(regional_fig,minpopulation=200000,
-                                    close_threshhold=0.03,offset=0.03,
+                                    close_threshhold=0.01,offset=0.03,
                                     dotsize=0.25,hor_offset_multiplier=3.5)
 regional_fig.show()
 

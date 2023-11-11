@@ -202,7 +202,7 @@ def plot_base_map(region,projection="Q15c+du",figure_name="figure!",
     fig.grdimage(grid=grid,
                  projection=projection,
                  frame=["a",f'+t{figure_name}'],
-                 cmap=cmap)
+                 cmap=True)
     fig.coast(shorelines="4/0.5p,black",
               projection=projection,
               borders="a/1.2p,black",

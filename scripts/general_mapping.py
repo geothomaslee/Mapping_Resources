@@ -11,6 +11,7 @@ specific mapping scripts.
 
 import os
 import pandas as pd
+import pygmt
 
 resource_folder = os.path.join(os.path.dirname(__file__),'../resources')
 
@@ -90,6 +91,43 @@ def get_margin_from_bounds(bounds,margin=0.1):
     
     return marginal_bounds
 
+def check_if_in_bounds(lat,lon,bounds):
+    min_lon = bounds[0]
+    max_lon = bounds[1]
+    min_lat = bounds[2]
+    max_lat = bounds[3]
+    if lat > min_lat and lat < max_lat and lon > min_lon and lon < max_lon:
+        is_in_bounds = True
+    else:
+        is_in_bounds = False
+        
+    return is_in_bounds
+
+def plot_base_map(region,projection="Q15c+du",figure_name="figure!",
+                  resolution='03s',
+                  cmap="./Resources/colormaps/colombia.cpt",
+                  box_bounds=None,margin=0.1):
+    
+    bounds = get_margin_from_bounds(region,margin=margin)
+    
+    grid = pygmt.datasets.load_earth_relief(resolution=resolution, region=bounds)
+    
+    fig = pygmt.Figure()
+    fig.basemap(region=bounds,
+                projection=projection,
+                frame=True)
+    fig.grdimage(grid=grid,
+                 projection=projection,
+                 frame=["a",f'+t{figure_name}'],
+                 cmap=cmap)
+    fig.coast(shorelines="4/0.5p,black",
+              projection=projection,
+              borders="2/1.2p,black",
+              water="skyblue",
+              resolution="f")
+    
+    return fig
+
 def plot_holocene_volcanoes(fig):
     vol_file = os.path.join(resource_folder,'GVP_Volcano_List_Holocene.csv')
     holo_volc_df = pd.read_csv(vol_file)
@@ -101,6 +139,29 @@ def plot_holocene_volcanoes(fig):
              style='t0.35c',
              fill='red')
     
+    return fig
+
+def plot_major_cities(fig,bounds,minpopulation=100000):
+    min_lon = bounds[0]
+    max_lon = bounds[1]
+    min_lat = bounds[2]
+    max_lat = bounds[3]
+    
+    cities_csv = os.path.join(resource_folder,'worldcities.csv')
+    cities_df = pd.read_csv(cities_csv)
+    
+    # Pulling cities that meet criteria
+    df_in_lat = cities_df[cities_df['lat'].between(min_lat,max_lat)]
+    df_in_bounds = df_in_lat[df_in_lat['lng'].between(min_lon,max_lon)]
+    df_meets_crit = df_in_bounds[df_in_bounds['population'] >= minpopulation]
+    
+    for index, row in df_meets_crit.iterrows():
+        fig.plot(x=row['lng'],
+                 y=row['lat'],
+                 style='c0.35',
+                 fill='black',
+                 label=row['city_ascii'])
+    fig.legend()
     return fig
 
 def save_fig(fig,name,dpi=720,ftype="png"):

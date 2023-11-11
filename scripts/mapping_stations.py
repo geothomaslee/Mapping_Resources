@@ -198,7 +198,7 @@ def plot_bounding_box(fig, bounds):
     return fig
     
 
-def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",
+def plot_stations(inventory,fig=None,projection="Q15c+du",figure_name="figure!",
                   resolution='03s',region=None,
                   cmap="./Resources/colormaps/colombia.cpt",
                   box_bounds=None,margin=0.1,
@@ -208,6 +208,9 @@ def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",
     ----------
     inventory : obspy.core.inventory.Inventory
         ObsPy inventory containing the stations to plot.
+    fig : pygmt.Figure
+        Give a pygmt figure to plot stations on top of an existing figure.
+        Otherwise, a basemap will be created automatically.
     projection : string, optional
         GMT flag for specifying projection. The default is "Q15c+du".
     figure_name : string, optional
@@ -239,22 +242,24 @@ def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",
         bounds = gm.get_margin_from_lat_lon(lats,lons,margin=margin)
     else:
         bounds = gm.get_margin_from_bounds(region,margin=margin)
+        
+    if fig == None:
+        grid = pygmt.datasets.load_earth_relief(resolution=resolution, region=bounds)
+        
+        fig = pygmt.Figure()
+        fig.basemap(region=bounds,
+                    projection=projection,
+                    frame=True)
+        fig.grdimage(grid=grid,
+                     projection=projection,
+                     frame=["a",f'+t{figure_name}'],
+                     cmap=cmap)
+        fig.coast(shorelines="4/0.5p,black",
+                  projection=projection,
+                  borders="2/1.2p,black",
+                  water="skyblue",
+                  resolution="f")
     
-    grid = pygmt.datasets.load_earth_relief(resolution=resolution, region=bounds)
-    
-    fig = pygmt.Figure()
-    fig.basemap(region=bounds,
-                projection=projection,
-                frame=True)
-    fig.grdimage(grid=grid,
-                 projection=projection,
-                 frame=["a",f'+t{figure_name}'],
-                 cmap=cmap)
-    fig.coast(shorelines="4/0.5p,black",
-              projection=projection,
-              borders="2/1.2p,black",
-              water="skyblue",
-              resolution="f")
     
     colors = ["cyan","yellow","green","blue","purple","orange","red"]
 
@@ -285,8 +290,6 @@ def plot_stations(inventory,projection="Q15c+du",figure_name="figure!",
     
     if plot_holo_vol == True:
         fig = gm.plot_holocene_volcanoes(fig)
-        
-    fig.legend()
     
     return fig
 

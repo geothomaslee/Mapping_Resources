@@ -103,6 +103,12 @@ def check_if_in_bounds(lat,lon,bounds):
         
     return is_in_bounds
 
+def get_bounds_from_figure(fig):
+    region = fig.region
+    bounds_list = region.tolist()
+    
+    return bounds_list
+
 def plot_base_map(region,projection="Q15c+du",figure_name="figure!",
                   resolution='03s',
                   cmap="./Resources/colormaps/colombia.cpt",
@@ -122,7 +128,7 @@ def plot_base_map(region,projection="Q15c+du",figure_name="figure!",
                  cmap=cmap)
     fig.coast(shorelines="4/0.5p,black",
               projection=projection,
-              borders="2/1.2p,black",
+              borders="a/1.2p,black",
               water="skyblue",
               resolution="f")
     
@@ -141,7 +147,10 @@ def plot_holocene_volcanoes(fig):
     
     return fig
 
-def plot_major_cities(fig,bounds,minpopulation=100000):
+def plot_major_cities(fig,bounds=None,minpopulation=100000):
+    if bounds == None:
+        bounds = get_bounds_from_figure(fig)
+    
     min_lon = bounds[0]
     max_lon = bounds[1]
     min_lat = bounds[2]
@@ -155,12 +164,19 @@ def plot_major_cities(fig,bounds,minpopulation=100000):
     df_in_bounds = df_in_lat[df_in_lat['lng'].between(min_lon,max_lon)]
     df_meets_crit = df_in_bounds[df_in_bounds['population'] >= minpopulation]
     
+    offset = 0.03
+    offset_height = abs(max_lat - min_lat) * offset
+    
     for index, row in df_meets_crit.iterrows():
         fig.plot(x=row['lng'],
                  y=row['lat'],
                  style='c0.35',
                  fill='black',
                  label=row['city_ascii'])
+        
+        fig.text(x=row['lng'],
+                 y=row['lat'] + offset_height,
+                 text=row['city_ascii'])
 
     return fig
 

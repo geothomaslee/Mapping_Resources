@@ -19,9 +19,8 @@ station_inv = ms.find_multi_network(deployment_list,region_bounds)
 
 large_region_bounds = gm.get_margin_from_bounds(region_bounds,1.5)
 test_fig = gm.plot_base_map(large_region_bounds,resolution='15s')
-test_fig = gm.plot_major_cities(test_fig,large_region_bounds,minpopulation=100000)
+test_fig = gm.plot_major_cities(test_fig,minpopulation=300000)
 test_fig.show()
-
 
 """
 # Plotting a regional overview

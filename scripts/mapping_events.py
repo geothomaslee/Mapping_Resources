@@ -16,7 +16,28 @@ else:
 def find_events_in_region(times,region,
                           client='IRIS',magnitude=None,
                           depth=None):
-    
+    """
+    Parameters
+    ----------
+    times : list of strings
+        [starttime, endtime] in format "yyyy-mm-ddT00.00.00.000".
+    region : list of ints or floats
+        [minlon, maxlon, minlat, maxlat].
+    client : string, optional
+        Client hosting catalog to search in. The default is 'IRIS'.
+    magnitude : list of ints or floats, OR float or int, optional
+        [minmag,maxmag]. If int or float, will use value as minimum magnitude 
+        with no maximum. The default is None.
+    depth : list of ints or floats, OR float or int, optional
+        [mindepth,maxdepth]. If int or float, will use value as minumum magnitude
+        with no maximum. The default is None.
+
+    Returns
+    -------
+    catalog : obspy.core.catalog.Catalog
+        ObsPy catalog containing events.
+
+    """
     if type(times) != list:
         raise TypeError('Expected list for times: [starttime, endtime]')
         
@@ -50,13 +71,41 @@ def find_events_in_region(times,region,
 def find_events_around_point(times,latitude,longitude,radius,
                              client='IRIS',magnitude=None,
                              depth=None):
+    """
+    Parameters
+    ----------
+    times : list of strings
+        [starttime, endtime] in format "yyyy-mm-ddT00.00.00.000".
+    latitude : int or float
+        Latitude of point to search around.
+    longitude : int or float
+        Longitude of point to search around
+    radius : list of ints or floats
+        [minradius,maxradius] in DEGREES from point
+    client : string, optional
+        Client hosting catalog to search in. The default is 'IRIS'.
+    magnitude : list of ints or floats, OR float or int, optional
+        [minmag,maxmag]. If int or float, will use value as minimum magnitude 
+        with no maximum. The default is None.
+    depth : list of ints or floats, OR float or int, optional
+        [mindepth,maxdepth]. If int or float, will use value as minumum magnitude
+        with no maximum. The default is None.
 
+    Returns
+    -------
+    catalog : obspy.core.catalog.Catalog
+        ObsPy catalog containing events.
+
+    """
     working_client = Client(client)
     
     if type(radius) != list:
         raise TypeError('Expected list for radius: [minradius, maxradius]')
     if type(times) != list:
         raise TypeError('Expected list for times: [starttime, endtime]')
+        
+    if radius[1] > 180:
+        raise ValueError('maxradius > 180. Remember radius is in degrees, not km')
                         
     if magnitude == None:
         magnitude = [3, 10]

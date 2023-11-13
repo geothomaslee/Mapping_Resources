@@ -1,4 +1,5 @@
 # Mapping Resources
-### A collection of scripts and datasets to aid in creating maps for seismic deployments.
+### A collection of scripts and datasets for quick creation of figures for seismologists.
 
-These are meant to be a ready to use base for making maps of seismic deployments. They default settings and functionalities will make something good enough for a quick map but are intended to be a very easy to edit framework for fine tuning. 
+## November 2023 Update
+These were originally written in April of 2023 when I was still learning Python and the code very clearly reflects that. I have since re-written about 90% of the code to be faster, easier, and more generalized to be applied to a wider variety of situations. Old scripts can still be found under legacy_scripts in case I ever need to reference it (highly doubtful).

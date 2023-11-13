@@ -7,6 +7,8 @@ Created on Tue Nov  7 15:05:26 2023
 
 from obspy.clients.fdsn import Client
 import pygmt
+import numpy as np
+from tqdm import tqdm
 
 if __name__ == '__main__':
     import general_mapping as gm
@@ -236,6 +238,9 @@ def plot_stations(inventory,fig=None,projection="Q15c+du",figure_name="figure!",
 
     """
     
+    if __name__ == '__main__':
+        cmap="../Resources/colormaps/colombia.cpt",
+    
     lats,lons,elevs = get_coordinate_list(inventory)
     
     if region == None:
@@ -294,5 +299,55 @@ def plot_stations(inventory,fig=None,projection="Q15c+du",figure_name="figure!",
         fig = gm.plot_holocene_volcanoes(fig)
     
     return fig
+
+def plot_cross_station_paths(inventory, fig):
+                              
+    lats,lons,elevs = get_coordinate_list(inventory)
+        
+    coord_pairs = list(zip(lats, lons))
+    
+    pair_test_list = []
+    
+    for index, pair in enumerate(tqdm(coord_pairs)):
+        for index2 in np.arange(index+1,len(coord_pairs),1):
+            pair2 = coord_pairs[index2]
+            
+            cross_pair_lons = [pair[0],pair2[0]]
+            cross_pair_lats = [pair[1],pair2[1]]
+            
+            fig.plot(x=cross_pair_lons,
+                     y=cross_pair_lats,
+                     pen='1p,black')
+            
+    return fig
+    
+            
+            
+    
+        
+
+
+region_bounds = [-122.5, -120.5, 45, 47.25]
+box_bounds = [-122.5, -120.9, 46.1, 47.3]
+deployment_list = [["UW","2015-01-01","2017-12-31"],["XU","2007-01-01","2011-12-31"],
+                   ["XD","2014-01-01","2016-12-31","M*"],["TA","2006-01-01","2023-11-6"],
+                   ["CC","2020-10-22","2023-11-7"],["YH","2016-01-01","2016-12-31"]]
+station_inv = find_multi_network(deployment_list,box_bounds)
+
+regional_fig = plot_stations(station_inv,
+                             figure_name="Rainier Region Seismic Stations",
+                             resolution="15s",
+                             margin=0.1,
+                             region=box_bounds)
+
+cross_fig = plot_cross_station_paths(station_inv, regional_fig)
+
+cross_fig.show()
+                                
+
+
+
+
+
 
     

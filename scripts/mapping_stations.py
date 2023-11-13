@@ -107,6 +107,12 @@ def find_multi_network(deployment_list,bounds,client="IRIS"):
                                                         maxlongitude=maxlon)
             station_inv += secondary_inv
             
+    station_total = 0
+    for network in station_inv:
+        station_total += len(network)
+        
+    print(f'{station_total} stations found in {len(station_inv)} networks!')
+            
     return station_inv
 
 def get_coordinates_from_network(network):
@@ -275,7 +281,8 @@ def plot_stations(inventory,fig=None,projection="Q15c+du",figure_name="figure!",
                  style="t0.4c",
                  fill=colors[i],
                  label=network.code,
-                 pen="0.2p")
+                 pen="0.2p",
+                 connection='r')
         
     fig.legend()
         
@@ -306,8 +313,7 @@ def plot_cross_station_paths(inventory, fig):
         
     coord_pairs = list(zip(lats, lons))
     
-    pair_test_list = []
-    
+    """
     for index, pair in enumerate(tqdm(coord_pairs)):
         for index2 in np.arange(index+1,len(coord_pairs),1):
             pair2 = coord_pairs[index2]
@@ -318,9 +324,51 @@ def plot_cross_station_paths(inventory, fig):
             fig.plot(x=cross_pair_lons,
                      y=cross_pair_lats,
                      pen='1p,black')
+    """
+    """
+    for index in tqdm(np.arange(0, 1)):
+        pair = coord_pairs[index]
+        print(f'starting pair {pair}')
+        for index2 in tqdm(np.arange(index+1,len(coord_pairs),1)):
+            pair2 = coord_pairs[index2]
+            
+            cross_pair_lons = [pair[1],pair2[1]]
+            cross_pair_lats = [pair[0],pair2[0]]
+            
+            if index2 == 3:
+                print(pair2)
+                print(cross_pair_lons)
+                print(cross_pair_lats)
+            
+            fig.plot(x=cross_pair_lons,
+                     y=cross_pair_lats,
+                     pen='0.2p')
             
     return fig
     
+    """
+    
+    coord1 = coord_pairs[0]
+    coord2 = coord_pairs[1]
+    coord3 = coord_pairs[2]
+    
+    lons1 = [coord1[1],coord2[1]]
+    lons2 = [coord2[1],coord3[1]]
+    
+    lats1 = [coord1[0],coord2[0]]
+    lats2 = [coord2[0],coord3[0]]
+    
+    lons = [lons1, lons2]
+    lats = [lats1, lats2]
+    
+    print(lons)
+    print(lats)
+    
+    fig.plot(x=lons,
+             y=lats,
+             pen='0.1p')
+    
+    return fig
             
             
     
@@ -340,10 +388,13 @@ regional_fig = plot_stations(station_inv,
                              margin=0.1,
                              region=box_bounds)
 
-cross_fig = plot_cross_station_paths(station_inv, regional_fig)
+
+regional_fig.show()
+"""
+cross_fig = plot_cross_station_paths(inventory=station_inv,fig=regional_fig)
 
 cross_fig.show()
-                                
+                """                
 
 
 

@@ -312,13 +312,10 @@ def plot_cross_station_paths(inventory, fig):
         
     coord_pairs = list(zip(lats, lons))
     
-    
-        
-    
     crossed_pair_list = []
     
     #for index, pair in enumerate(tqdm(coord_pairs)):
-    for index in np.arange(0,1,1): # Temp only run through first station for testing
+    for index in np.arange(0,159,1): # Temp only run through first station for testing
         pair=coord_pairs[index]
         for index2 in np.arange(index+1,len(coord_pairs),1):
             pair2 = coord_pairs[index2]
@@ -328,9 +325,6 @@ def plot_cross_station_paths(inventory, fig):
             crossed_pair = [cross_pair_lons, cross_pair_lats]
             crossed_pair_list.append(crossed_pair)
             
-    print(crossed_pair_list)
-    print(len(crossed_pair_list))
-    
     """
     for index in tqdm(np.arange(0, 1)):
         pair = coord_pairs[index]
@@ -351,11 +345,12 @@ def plot_cross_station_paths(inventory, fig):
                      pen='0.2p')
             
     """
-    print(f'Done making table!')
+    print('Done making table!')
     
-    for cross_pair
-    fig.plot(x=cross_pair
-             pen='0.2p')
+    for cross_pair in tqdm(crossed_pair_list):
+        fig.plot(x=cross_pair[1],
+                 y=cross_pair[0],
+                 pen='0.05p,black')
 
     return fig
     
@@ -376,6 +371,7 @@ regional_fig = plot_stations(station_inv,
                              region=box_bounds)
 
 cross_fig = plot_cross_station_paths(inventory=station_inv,fig=regional_fig)
+cross_fig.show()
 
 
 

@@ -161,6 +161,13 @@ def get_bounds_from_figure(fig):
     
     return bounds_list
 
+def find_elevation_range(grid):
+    grid_np = grid.values
+    max_elev = np.amax(grid_np)
+    min_elev = np.amin(grid_np)
+    
+    return min_elev, max_elev
+
 def plot_base_map(region,projection="Q15c+du",figure_name="figure!",
                   resolution='03s',
                   cmap="./Resources/colormaps/colombia.cpt",
@@ -202,7 +209,7 @@ def plot_base_map(region,projection="Q15c+du",figure_name="figure!",
     fig.grdimage(grid=grid,
                  projection=projection,
                  frame=["a",f'+t{figure_name}'],
-                 cmap=True)
+                 cmap=cmap)
     fig.coast(shorelines="4/0.5p,black",
               projection=projection,
               borders="a/1.2p,black",

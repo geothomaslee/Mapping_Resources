@@ -38,6 +38,7 @@ rainier_region_fig = ms.plot_stations(station_inv,
                        
 rainier_region_fig.show()
 gm.save_fig(rainier_region_fig,"Regional_Stations")
+
 # Plotting the bounding box
 local_fig = ms.plot_stations(station_inv,region=box_bounds,
                              figure_name="Stations within Bounding Box",

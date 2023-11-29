@@ -210,7 +210,7 @@ def plot_stations(inventory,fig=None,projection="Q15c+du",figure_name="figure!",
                   resolution='03s',region=None,
                   cmap="./Resources/colormaps/colombia.cpt",
                   box_bounds=None,margin=0.1,
-                  plot_holo_vol=False):
+                  plot_holo_vol=False,outside_stats_small=True):
     """
     Parameters
     ----------
@@ -236,6 +236,9 @@ def plot_stations(inventory,fig=None,projection="Q15c+du",figure_name="figure!",
     margin : int or float, optional
         Margin size, multiplied by the length of the bounds. 0.1 = 10% margin. 
         The default is 0.1.
+    outside_stats_small : bool, optional
+        If True and a bounding box has been specified, then will make stations
+        outside the bounding box smaller.
 
     Returns
     -------
@@ -246,6 +249,10 @@ def plot_stations(inventory,fig=None,projection="Q15c+du",figure_name="figure!",
     
     if __name__ == '__main__':
         cmap="../Resources/colormaps/colombia.cpt",
+        
+    if outside_stats_small == True:
+        if box_bounds == None:
+            return ValueError('No box bounds specified for outside_stats_small')
     
     lats,lons,elevs = get_coordinate_list(inventory)
     
@@ -273,6 +280,7 @@ def plot_stations(inventory,fig=None,projection="Q15c+du",figure_name="figure!",
     
     
     colors = ["cyan","yellow","green","blue","purple","orange","red"]
+    
 
     for i, network in enumerate(inventory):
         lats,lons,elevs = get_coordinates_from_network(network)
@@ -282,8 +290,6 @@ def plot_stations(inventory,fig=None,projection="Q15c+du",figure_name="figure!",
                  fill=colors[i],
                  label=network.code,
                  pen="0.2p")
-        
-    fig.legend()
         
     if box_bounds != None:
         if len(bounds) != 4:
@@ -303,10 +309,17 @@ def plot_stations(inventory,fig=None,projection="Q15c+du",figure_name="figure!",
     
     if plot_holo_vol == True:
         fig = gm.plot_holocene_volcanoes(fig)
+            
+    fig.legend()
     
     return fig
 
 def plot_cross_station_paths(inventory, fig):
+    """
+    WORK IN PROGRESS FUNCTION
+    SHOULD NOT BE USED
+    MAY BE REMOVED IN (NEAR) FUTURE
+    """
                               
     lats,lons,elevs = get_coordinate_list(inventory)
         
@@ -354,24 +367,3 @@ def plot_cross_station_paths(inventory, fig):
 
     return fig
     
-        
-
-
-region_bounds = [-122.5, -120.5, 45, 47.25]
-box_bounds = [-122.5, -120.9, 46.1, 47.3]
-deployment_list = [["UW","2015-01-01","2017-12-31"],["XU","2007-01-01","2011-12-31"],
-                   ["XD","2014-01-01","2016-12-31","M*"],["TA","2006-01-01","2023-11-6"],
-                   ["CC","2020-10-22","2023-11-7"],["YH","2016-01-01","2016-12-31"]]
-station_inv = find_multi_network(deployment_list,box_bounds)
-
-regional_fig = plot_stations(station_inv,
-                             figure_name="Rainier Region Seismic Stations",
-                             resolution="15s",
-                             margin=0.1,
-                             region=box_bounds)
-
-cross_fig = plot_cross_station_paths(inventory=station_inv,fig=regional_fig)
-cross_fig.show()
-
-
-

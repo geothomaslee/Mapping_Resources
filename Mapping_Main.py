@@ -7,6 +7,7 @@ Created on Tue Nov  7 15:05:02 2023
 
 import scripts.mapping_stations as ms
 import scripts.general_mapping as gm
+import pandas as pd
 
 deployment_list = [["UW","2015-01-01","2017-12-31"],["XU","2007-01-01","2011-12-31"],
                    ["XD","2014-01-01","2016-12-31","M*"],["TA","2006-01-01","2023-11-6"],
@@ -16,6 +17,14 @@ region_bounds = [-122.5, -120.5, 45, 47.25]
 box_bounds = [-122.5, -120.9, 46.1, 47.3]
 
 station_inv = ms.find_multi_network(deployment_list,region_bounds)
+
+""" Code For Saving The Stations Into a CSV for Book-Keeping Purposes
+station_dict = station_inv.get_contents()
+stations_only_dict = station_dict['stations']
+export_station_dict = {'Stations' : stations_only_dict}
+export_station_df = pd.DataFrame(export_station_dict)
+export_station_df.to_csv('Stations_To_Correlate_List.csv')
+"""
 
 # Plotting a regional overview
 regional_fig = ms.plot_stations(station_inv,
@@ -46,3 +55,4 @@ local_fig = ms.plot_stations(station_inv,region=box_bounds,
                         
 local_fig.show()
 gm.save_fig(local_fig,"Local_View_Stations")
+

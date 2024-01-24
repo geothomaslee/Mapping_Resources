@@ -9,6 +9,7 @@ from obspy.clients.fdsn import Client
 import pygmt
 import numpy as np
 from tqdm import tqdm
+import pandas as pd
 
 if __name__ == '__main__':
     import general_mapping as gm
@@ -367,3 +368,47 @@ def plot_cross_station_paths(inventory, fig):
 
     return fig
     
+def get_station_csv(inventory,filename='Stations.csv'):
+    """
+    Parameters
+    ----------
+    inventory : obspy.core.inventory.Inventory
+        ObsPy station inventory.
+    filename : string, optional
+        Name of CSV. The default is 'Stations.csv'.
+
+    Returns
+    -------
+    None.
+
+    """
+    networks = []
+    stations = []
+    start_dates = []
+    end_dates = []
+    latitudes = []
+    longitudes = []
+
+
+    for network in inventory:
+        for station in network:
+            networks.append(network.code)
+            stations.append(station.code)
+            start_dates.append(station.start_date)
+            
+            end_date = station.end_date
+            if end_date:
+                end_dates.append(end_date)
+            else:
+                end_dates.append('Current')
+                
+            latitudes.append(station.latitude)
+            longitudes.append(station.longitude)
+
+
+    stat_dict = {'Network' : networks, 'Station' : stations,
+                 'Latitudes' : latitudes, 'Longitudes' : longitudes,
+                 'Start Date' : start_dates, 'End Date' : end_dates}
+
+    stat_df = pd.DataFrame(stat_dict)
+    stat_df.to_csv(filename)

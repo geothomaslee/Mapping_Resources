@@ -7,6 +7,7 @@ Created on Tue Nov  7 15:05:02 2023
 
 import scripts.mapping_stations as ms
 import scripts.general_mapping as gm
+import scripts.station_utils as su
 
 deployment_list = [["UW","2015-01-01","2017-12-31"],["XU","2007-01-01","2011-12-31"],
                    ["XD","2014-01-01","2016-12-31","M*"],["TA","2006-01-01","2023-11-6"],
@@ -17,13 +18,11 @@ box_bounds = [-122.5, -120.9, 46.1, 47.3]
 
 station_inv = ms.find_multi_network(deployment_list,region_bounds)
 
-ms.get_station_csv(station_inv,filename='Stations_To_Correlate.csv')
+station_df = su.get_station_df(station_inv)
 
-def station_availability_from_csv(filepath):
-    if type(filepath) != str:
-        raise TypeError('Expected type string for filepath to csv')
-        
-station_availability_from_csv('./Stations_To_Correlate.csv')
+su.station_availability_from_df(station_df)
+
+
 
 
 """

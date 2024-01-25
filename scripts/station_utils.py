@@ -102,12 +102,11 @@ def get_station_csv(inventory,filename='Stations.csv'):
     stat_df.to_csv(filename)
     
     
-def station_availability_from_csv(filepath):
-    if type(filepath) != str:
-        raise TypeError('Expected type string for filepath to csv')
+def station_availability_from_df(df):
+    if type(df) != pd.DataFrame:
+        raise TypeError('Expected pandas.DataFrame object as input')
+    else:
+        print(f'Read DataFrame with length {len(df)}')
         
     
-        
 
-        
-station_availability_from_csv('./Stations_To_Correlate.csv')

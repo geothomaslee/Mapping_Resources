@@ -20,7 +20,7 @@ station_inv = ms.find_multi_network(deployment_list,region_bounds)
 
 station_df = su.get_station_df(station_inv)
 
-su.station_availability_from_df(station_df)
+su.station_availability_from_df(station_df,startdate='2000-01-01')
 
 
 

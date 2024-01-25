@@ -19,6 +19,12 @@ station_inv = ms.find_multi_network(deployment_list,region_bounds)
 
 ms.get_station_csv(station_inv,filename='Stations_To_Correlate.csv')
 
+def station_availability_from_csv(filepath):
+    if type(filepath) != str:
+        raise TypeError('Expected type string for filepath to csv')
+        
+station_availability_from_csv('./Stations_To_Correlate.csv')
+
 
 """
 

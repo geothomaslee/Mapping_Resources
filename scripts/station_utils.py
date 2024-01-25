@@ -131,19 +131,43 @@ def station_availability_from_df(df,startdate,enddate=None):
         
     num_years = enddate.year - startdate.year
     
+  
     time_bins = []
     
+    years_list = []
+    months_list = []
+
     for relative_year in range(num_years):
         year = startdate.year + relative_year
         for month in range(1, 13, 1):
             time_bin = (year, month)
             time_bins.append(time_bin)
-            
+            years_list.append(year)
+            months_list.append(month)
+         
+    # Create a list of networks
+    network_list = df.Network.unique()
+    
+    # Create a dictionary with time bins as keys and counter dict for that bin
+    # as the values
+    monthly_network_count = {}
     for time_bin in time_bins:
+        monthly_network_count[time_bin] = None
+            
+    
+    for i, time_bin in enumerate(time_bins):
+        
+        # Reset the network counter so all networks are at 0
+        network_count = {}
+        for network in network_list:
+            network_count[network] = [0]
+        network_count['Total Stations'] = [0]
+        
         year = time_bin[0]
         month = time_bin[1]
        
-        for index in range(157, 161, 1):
+        # Determine the station count for each network and put it into a dict        
+        for index in range(len(df)):
             startyear = df['Start Date'][index].year
             startmonth = df['Start Date'][index].month
             endyear = df['End Date'][index].year
@@ -156,22 +180,37 @@ def station_availability_from_df(df,startdate,enddate=None):
                 _inbin_ = False
             elif (year - startyear) == 0 and (month - startmonth) <0:
                 _inbin_ = False
-            elif (year - endyear) >0:
+            elif (year - endyear) > 0:
                 _inbin_ = False
-            elif (year - endyear) == 0 and (month - endmonth) >0 :
+            elif (year - endyear) == 0 and (month - endmonth) > 0 :
                 _inbin_ = False
             else:
                 _inbin_ = True
                 
             if _inbin_ == True:
-                print(f'Station {network} {station} available during time bin {time_bin}')
+                network_count[network][0]+=1
+                network_count['Total Stations'][0]+= 1
             if _inbin_ == False:
-                print(f'Station {network} {station} unavailable during time bin {time_bin}')
+                pass
+                    
+        if i == 0:
+            df_station_count = pd.DataFrame.from_dict(network_count)
+        else:
+            df_station_row = pd.DataFrame.from_dict(network_count)
+            _combine_ = [df_station_count, df_station_row]
+            df_station_count = pd.concat(_combine_)
+    
+    df_station_count.insert(0,"Year",years_list)
+    df_station_count.insert(1,"Month",months_list)
+    
+    return df_station_count
+                
+    
                 
             
             
     
-    #for index in df.index:
+    
         
     
         

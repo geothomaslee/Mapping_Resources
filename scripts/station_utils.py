@@ -10,6 +10,7 @@ import pandas as pd
 import obspy
 from obspy import UTCDateTime
 from datetime import datetime, timezone
+import matplotlib.pyplot as plt
 
 
 def get_station_df(inventory):
@@ -106,6 +107,30 @@ def get_station_csv(inventory,filename='Stations.csv'):
     
     
 def station_availability_from_df(df,startdate,enddate=None):
+    """
+    Finds the number of stations available over time given a Data Frame created
+    by get_station_df. Outputs the information into a DataFrame and creates a
+    plot showing the stations available over time
+    
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Data Frame containing relevant station information, intended to be used
+        with DFs created by station_utils.get_station_df.
+    startdate : obspy.core.utcdatetime.UTCDateTime or string
+        Start date, either as a UTCDateTime object or a string that can be
+        converted to one by UTCDateTime
+    enddate : obspy.core.utcdatetime.UTCDateTime or string, optional
+        End date, either as a UTCDateTime object or a string that can be
+        converted to one by UTCDateTime. If none is set, then the current time
+        will be used as the end date.
+
+    Returns
+    -------
+    df_station_count : pandas.DataFrame
+        DataFrame containing the station count per network, and overall, for
+        every given month and year.
+    """
     if type(df) != pd.DataFrame:
         raise TypeError('Expected pandas.DataFrame object as input')
     else:
@@ -130,7 +155,8 @@ def station_availability_from_df(df,startdate,enddate=None):
         raise TypeError('End date must be a UTCDateTime object or string, or None to use current time')
         
     num_years = enddate.year - startdate.year
-    
+    start_month = startdate.month
+    start_year = startdate.year
   
     time_bins = []
     
@@ -154,7 +180,7 @@ def station_availability_from_df(df,startdate,enddate=None):
     for time_bin in time_bins:
         monthly_network_count[time_bin] = None
             
-    
+    datetime_bin_list = []
     for i, time_bin in enumerate(time_bins):
         
         # Reset the network counter so all networks are at 0
@@ -165,6 +191,16 @@ def station_availability_from_df(df,startdate,enddate=None):
         
         year = time_bin[0]
         month = time_bin[1]
+
+        # Create the months as UTCDateTime objects so that they can be plotted
+        # Later with actual time stamps
+        """
+        if month < 10:
+            time_string = str(year) + ',' + '0' + str(month) + ',01,00:00:00'
+        else:
+            time_string = str(year) + ',' + str(month) + ',01,00:00:00' 
+        """
+        datetime_bin_list.append(datetime(year, month, 1, 0, 0))
        
         # Determine the station count for each network and put it into a dict        
         for index in range(len(df)):
@@ -172,8 +208,6 @@ def station_availability_from_df(df,startdate,enddate=None):
             startmonth = df['Start Date'][index].month
             endyear = df['End Date'][index].year
             endmonth = df['End Date'][index].month
-            
-            station = df['Station'][index]
             network = df['Network'][index]
             
             if (year - startyear) < 0:
@@ -192,17 +226,32 @@ def station_availability_from_df(df,startdate,enddate=None):
                 network_count['Total Stations'][0]+= 1
             if _inbin_ == False:
                 pass
-                    
+        # Putting it into a DataFrame to export as CSV and easier plotting
         if i == 0:
             df_station_count = pd.DataFrame.from_dict(network_count)
         else:
             df_station_row = pd.DataFrame.from_dict(network_count)
             _combine_ = [df_station_count, df_station_row]
-            df_station_count = pd.concat(_combine_)
+            df_station_count = pd.concat(_combine_,ignore_index=True)
     
     df_station_count.insert(0,"Year",years_list)
     df_station_count.insert(1,"Month",months_list)
     
+    count_list = []
+    for months_since_start in range(len(df_station_count)):
+        total_stations = df_station_count['Total Stations'][months_since_start]
+        count_list.append(total_stations)
+        
+    # Plotting the stations available over time    
+    fig, ax = plt.subplots()
+    ax.plot(datetime_bin_list,
+            count_list)
+    ax.set(xlabel='Months since January 2000',
+           ylabel='Online Station Count',
+           title='Stations Available Over Time')
+    
+    plt.show()
+        
     return df_station_count
                 
     

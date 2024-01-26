@@ -33,6 +33,7 @@ def get_station_df(inventory):
     end_dates = []
     latitudes = []
     longitudes = []
+    channels = []
 
 
     for network in inventory:
@@ -49,11 +50,13 @@ def get_station_df(inventory):
                 
             latitudes.append(station.latitude)
             longitudes.append(station.longitude)
+            channels.append(station.channels)
 
 
     stat_dict = {'Network' : networks, 'Station' : stations,
                  'Latitudes' : latitudes, 'Longitudes' : longitudes,
-                 'Start Date' : start_dates, 'End Date' : end_dates}
+                 'Start Date' : start_dates, 'End Date' : end_dates,
+                 'Channels' : channels}
 
     stat_df = pd.DataFrame(stat_dict)
 
@@ -80,6 +83,7 @@ def get_station_csv(inventory,filename='Stations.csv'):
     end_dates = []
     latitudes = []
     longitudes = []
+    channels = []
 
 
     for network in inventory:
@@ -96,11 +100,13 @@ def get_station_csv(inventory,filename='Stations.csv'):
                 
             latitudes.append(station.latitude)
             longitudes.append(station.longitude)
+            channels.append(station.channels)
 
 
     stat_dict = {'Network' : networks, 'Station' : stations,
                  'Latitudes' : latitudes, 'Longitudes' : longitudes,
-                 'Start Date' : start_dates, 'End Date' : end_dates}
+                 'Start Date' : start_dates, 'End Date' : end_dates,
+                 'Channels' : channels}
 
     stat_df = pd.DataFrame(stat_dict)
     stat_df.to_csv(filename)

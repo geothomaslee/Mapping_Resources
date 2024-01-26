@@ -43,7 +43,7 @@ def find_stations(network, starttime,endtime,station='*',client="IRIS"):
                                               endtime=endtime,
                                               network=network, 
                                               station=station,
-                                              level="station",)
+                                              level="channel",)
     return station_inv
 
 def find_multi_network(deployment_list,bounds,client="IRIS"):
@@ -91,7 +91,7 @@ def find_multi_network(deployment_list,bounds,client="IRIS"):
                                                       endtime=endtime,
                                                       network=network, 
                                                       station=stations,
-                                                      level="station",
+                                                      level="channel",
                                                       minlatitude=minlat,
                                                       maxlatitude=maxlat,
                                                       minlongitude=minlon,
@@ -101,7 +101,7 @@ def find_multi_network(deployment_list,bounds,client="IRIS"):
                                                         endtime=endtime,
                                                         network=network, 
                                                         station=stations,
-                                                        level="station",
+                                                        level="channel",
                                                         minlatitude=minlat,
                                                         maxlatitude=maxlat,
                                                         minlongitude=minlon,

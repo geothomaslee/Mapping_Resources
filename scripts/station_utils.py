@@ -243,13 +243,13 @@ def station_availability_from_df(df,startdate,enddate=None):
         count_list.append(total_stations)
         
     # Plotting the stations available over time    
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(dpi=200)
     ax.plot(datetime_bin_list,
             count_list)
-    ax.set(xlabel='Months since January 2000',
-           ylabel='Online Station Count',
+    ax.set(ylabel='Online Station Count',
            title='Stations Available Over Time')
     
+    plt.savefig(fname='Station_Availability_Over_Time.png')
     plt.show()
         
     return df_station_count

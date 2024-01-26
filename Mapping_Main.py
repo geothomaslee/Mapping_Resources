@@ -21,9 +21,6 @@ station_inv = ms.find_multi_network(deployment_list,region_bounds)
 # Saving relevant station information, specifically designed for ambient noise
 # Studies but will contain useful info for any deployment
 station_df = su.get_station_df(station_inv)
-print(station_df['Channels']
-
-"""
 station_df.to_csv('Stations_To_Correlate.csv')
 
 station_avail_df = su.station_availability_from_df(station_df,startdate='2000-01-01')
@@ -58,4 +55,3 @@ local_fig = ms.plot_stations(station_inv,region=box_bounds,
                         
 local_fig.show()
 gm.save_fig(local_fig,"Local_View_Stations")
-"""

@@ -50,7 +50,16 @@ def get_station_df(inventory):
                 
             latitudes.append(station.latitude)
             longitudes.append(station.longitude)
-            channels.append(station.channels)
+            
+            if len(station.channels) == 1:
+                channels.append(station.channels[0].code)
+            else:
+                code_list = []
+                for channel_index in range(len(station.channels)):
+                    code = station.channels[channel_index].code
+                    code_list.append(code)
+                channels.append(code_list)
+                    
 
 
     stat_dict = {'Network' : networks, 'Station' : stations,

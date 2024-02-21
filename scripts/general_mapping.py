@@ -168,10 +168,24 @@ def find_elevation_range(grid):
     
     return min_elev, max_elev
 
+def convert_color_map(filepath,min_elev=-8000,max_elev=8000):
+    filepath = os.path.expanduser(filepath)
+    basename = os.path.basename(filepath)
+    if basename[-4:] != '.cpt':
+        raise ValueError('Given file is not a cpt file')
+        
+    cmap_df = pd.read_csv(filepath,delim_whitespace=True,comment='#')
+    cmap_df = cmap_df.dropna()
+    print(cmap_df)
+    
+        
+convert_color_map('~/Documents/GitHub/Mapping_Resources/resources/colormaps/pnw_1113.cpt')
+
+
 def plot_base_map(region,projection="Q15c+du",figure_name="figure!",
                   resolution='03s',
                   cmap="./Resources/colormaps/colombia.cpt",
-                  box_bounds=None,margin=0.1):
+                  box_bounds=None,margin=0.1,bathymetry=False):
     """
     Parameters
     ----------
@@ -191,6 +205,8 @@ def plot_base_map(region,projection="Q15c+du",figure_name="figure!",
         Bounds of box to draw on figure. If none given, none will be drawn.
     margin : float or int, optional
         Margin size, given as a decimal of the total dimensions. The default is 0.1.
+    bathymetry : bool
+        If False, will replace oceans with solid color. Default is false.
 
     Returns
     -------
@@ -210,13 +226,57 @@ def plot_base_map(region,projection="Q15c+du",figure_name="figure!",
                  projection=projection,
                  frame=["a",f'+t{figure_name}'],
                  cmap=cmap)
-    fig.coast(shorelines="4/0.5p,black",
-              projection=projection,
-              borders="a/1.2p,black",
-              water="skyblue",
-              resolution="f")
+    if not bathymetry:
+        fig.coast(shorelines="4/0.5p,black",
+                  projection=projection,
+                  borders="a/1.2p,black",
+                  water="skyblue",
+                  resolution="f")
     
     return fig
+
+def plot_label(fig,lat,lon,style='b0.35c',fill='black',label=None,
+               offset=0.02,hor_offset_multiplier=3.5,
+               fontsize=12,label_color='black'):
+    if label:
+        if type(label) != str:
+            raise TypeError('Label must be string')
+            
+    bounds = get_bounds_from_figure(fig)
+    
+    height,width,diag = get_map_dimensions(fig)
+    
+    min_lon = bounds[0]
+    max_lon = bounds[1]
+    min_lat = bounds[2]
+    max_lat = bounds[3]
+    
+    standard_offset_height = height * offset
+    standard_offset_width = width * offset * hor_offset_multiplier
+    
+    if label:
+        
+        if max_lat - lat <= standard_offset_height:
+            label_y_val = lat - standard_offset_height
+        else:
+            label_y_val = lat + standard_offset_height
+        
+        if abs(max_lon - lon) <= standard_offset_width:
+            label_x_val = lon - standard_offset_width
+            label_y_val = lat
+        elif abs(min_lon - lon) <= standard_offset_width:
+            label_x_val = lon + standard_offset_width
+            label_y_val = lat
+        else:
+            label_x_val = lon
+            
+        fig.text(x=label_x_val,
+                 y=label_y_val,
+                 text=label,
+                 font=f'{fontsize}p,Helvetica-Bold,{label_color}')
+        
+    return fig
+    
 
 def plot_holocene_volcanoes(fig):
     """

@@ -9,6 +9,7 @@ from obspy.clients.fdsn import Client
 import pygmt
 import numpy as np
 from tqdm import tqdm
+import pandas as pd
 
 if __name__ == '__main__':
     import general_mapping as gm
@@ -42,7 +43,7 @@ def find_stations(network, starttime,endtime,station='*',client="IRIS"):
                                               endtime=endtime,
                                               network=network, 
                                               station=station,
-                                              level="station",)
+                                              level="channel",)
     return station_inv
 
 def find_multi_network(deployment_list,bounds,client="IRIS"):
@@ -90,7 +91,7 @@ def find_multi_network(deployment_list,bounds,client="IRIS"):
                                                       endtime=endtime,
                                                       network=network, 
                                                       station=stations,
-                                                      level="station",
+                                                      level="channel",
                                                       minlatitude=minlat,
                                                       maxlatitude=maxlat,
                                                       minlongitude=minlon,
@@ -100,7 +101,7 @@ def find_multi_network(deployment_list,bounds,client="IRIS"):
                                                         endtime=endtime,
                                                         network=network, 
                                                         station=stations,
-                                                        level="station",
+                                                        level="channel",
                                                         minlatitude=minlat,
                                                         maxlatitude=maxlat,
                                                         minlongitude=minlon,
@@ -366,4 +367,3 @@ def plot_cross_station_paths(inventory, fig):
                  pen='0.05p,black')
 
     return fig
-    

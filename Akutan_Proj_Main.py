@@ -7,16 +7,23 @@ Created on Tue Feb 20 14:45:59 2024
 
 import scripts.mapping_stations as ms
 import scripts.general_mapping as gm
+import os
 
 
-akutan_region = [-167.8, -162.6, 53, 54.9]
-
+akutan_region = [-167.8, -162.6, 53.2, 55.1]
 projection = 'J-65/12c'
+
+
+cmap_path = os.path.expanduser('~/Documents/GitHub/Mapping_Resources/Resources/colormaps/usgs.cpt')
+cmap_path_split = os.path.split(cmap_path)
+converted_cmap_path = cmap_path_split[0] + '/converted_' + cmap_path_split[1]
+gm.convert_color_map(cmap_path, min_elev=0,max_elev=1500)
+
 
 akutan_regional_fig = gm.plot_base_map(akutan_region,projection=projection,
                                        figure_name='Akutan_Region',
-                                       cmap="./Resources/colormaps/pnw_1113_test.cpt",
-                                       bathymetry=False)
+                                       cmap=converted_cmap_path,
+                                       bathymetry=True,watercolor='royalblue')
 
 akutan_regional_fig = gm.plot_holocene_volcanoes(akutan_regional_fig)
 

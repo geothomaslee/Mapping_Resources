@@ -11,6 +11,19 @@ from glob import glob
 
 
 def clean_colormap_df(filepath):
+    """
+    Parameters
+    ----------
+    filepath : str
+        Path to the cpt.
+
+    Returns
+    -------
+    cmap_df : pandas.DataFrame
+        DataFrame containing the 8 columns expected in a .cpt file, trying to
+        catch as many formatting errors as possible while loading.
+
+    """
     filepath = os.path.expanduser(filepath)
     
     if not os.path.isfile(filepath):
@@ -43,6 +56,22 @@ def clean_colormap_df(filepath):
     return cmap_df
 
 def remap_cmap(cmap_df, min_elev, max_elev):
+    """
+    Parameters
+    ----------
+    cmap_df : pandas.DataFrame
+        DataFrame containing the 8 columns expected in a .cpt file.
+    min_elev : int
+        Minimum elevation to remap the colormap blocks to.
+    max_elev : TYPE
+        Maximum remapping-elevation.
+
+    Returns
+    -------
+    cmap_df : pandas.DataFrame
+        DataFrame with the colors from the input cpt remapped to the desired 
+        elevations.
+    """
     lower_bound_list = cmap_df['Bottom_Bound'].tolist()
     upper_bound_list = cmap_df['Upper_Bound'].tolist()
     lower_bound_list = [float(val) for val in lower_bound_list]
@@ -107,12 +136,40 @@ def remap_cmap(cmap_df, min_elev, max_elev):
     return cmap_df
 
 def isolate_bathymetry(bathy_cmap_df):
+    """
+    Parameters
+    ----------
+    bathy_cmap_df : pandas.DataFrame
+        Input colormap.
+
+    Returns
+    -------
+    bathy_cmap_df : pandas.DataFrame
+        Colormap with any elevation blocks above 0 removed.
+    """
     bathy_cmap_df.drop(bathy_cmap_df[bathy_cmap_df.Bottom_Bound >= 0].index, inplace=True)
     
     return bathy_cmap_df
 
 def add_bathymetry(topo_cmap_df,bathy_cmap_df,remap=True):
-    
+    """
+    Parameters
+    ----------
+    topo_cmap_df : pandas.DataFrame
+        DataFrame containing only colors for positive elevations, down to 0.
+    bathy_cmap_df : pandas.DataFrame
+        DataFrame containing only colors for negative elevations, up to 0.
+    remap : bool, optional
+        If true, will remap the input cpts to have the same elevation range,
+        using the absolute max elevation departure from 0. The default is True.
+        Set to false if the input colormaps have already been scaled to the 
+        desired elevation/depth ranges.
+
+    Returns
+    -------
+    combined_df : pandas.DataFrame
+        One dataframe, combining the two input cpts.
+    """
     if min(topo_cmap_df['Bottom_Bound'].tolist()) < 0:
         raise ValueError('Topo cmap contains bathymetric data, this function is for topo maps with elevation value 0')
     bathy_cmap_df.drop(bathy_cmap_df[bathy_cmap_df.Bottom_Bound >= 0].index, inplace=True)
@@ -134,6 +191,21 @@ def add_bathymetry(topo_cmap_df,bathy_cmap_df,remap=True):
     return combined_df
 
 def interpolate_cmap(cmap_df,cuts=10):
+    """
+    Parameters
+    ----------
+    cmap_df : pandas.DataFrame
+        Colormap in a dataframe.
+    cuts : int, optional
+        Number of extra elevation bounding boxes to add between the existing
+        bounding boxes. The default is 10.
+
+    Returns
+    -------
+    new_df : pandas.DataFrame
+        Colormap in a dataframe, with extra color/elevation steps, via linear
+        interpolation, added to simulate a continuous colormap.
+    """
     new_df = cmap_df.copy()
     new_df.drop(new_df[new_df.index > 0].index, inplace=True)
     
@@ -178,6 +250,19 @@ def interpolate_cmap(cmap_df,cuts=10):
     return new_df
 
 def save_cmap_df_as_cpt(cmap_df,filepath):
+    """
+    Parameters
+    ----------
+    cmap_df : pandas.DataFrame
+        Colormap in a dataframe, from the 8 columns of a .cpt
+    filepath : str
+        File path for the output .cpt
+
+    Returns
+    -------
+    None. Saves the colormap DataFrame as a properly formatted .cpt file.
+
+    """
     filepath=os.path.expanduser(filepath)
     
     if type(filepath) != str:
@@ -188,6 +273,37 @@ def save_cmap_df_as_cpt(cmap_df,filepath):
                       justify='left')
     
 def create_combined_color_map(topo_cmap,bathy_cmap,max_elev,max_depth,cmap_dir=None):
+    """
+    Given two .cpt files, this function will pull the topographic (elevations 
+    greater than 0) colors from the first and the bathymetric colors from the
+    second. Each one will be scaled to the maximum depth of the figure, as well
+    as the maximum topographic elevation, 
+
+    Parameters
+    ----------
+    topo_cmap : str
+        Path to the .cpt containing desired surface elevations. If just a name
+        and no full path is specified, will search cmap_dir for files that
+        match.
+    bathy_cmap : TYPE
+        Path to the .cpt containing desired bathymetric depthss. If just a name
+        and no full path is specified, will search cmap_dir for files that
+        match.
+    max_elev : int
+        Maximum surface elevation.
+    max_depth : int
+        Maximum ocean depth.
+    cmap_dir : str, optional
+        Path to the directory containing cmaps. The default is the working
+        GitHub folder tlee.
+
+    Returns
+    -------
+    save_path : str
+        File path to save the .cpt at. Given as a return so you can set
+        cmap = create_combined_color_map() when using plotting functions from
+        general_mapping.
+    """
     if not cmap_dir:
         cmap_dir = '~/Documents/GitHub/Mapping_Resources/resources/colormaps'
     
@@ -234,11 +350,3 @@ def create_combined_color_map(topo_cmap,bathy_cmap,max_elev,max_depth,cmap_dir=N
     save_cmap_df_as_cpt(combined_cmap_df,save_path)
     
     return save_path
-        
-cmap = create_combined_color_map('usgs','colombia',4000,-8000)
-
-
-
-        
-        
-

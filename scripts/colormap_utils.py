@@ -64,6 +64,7 @@ def remap_cmap(cmap_df, min_elev, max_elev):
     new_upper_bound_list = []
     
     if abs(min_bound) == abs(max_bound):
+        print('AHJH')
         elev_range = abs(min_bound)
         bound_range = abs(min_bound)
         for i in range(len(lower_bound_list)):
@@ -85,6 +86,7 @@ def remap_cmap(cmap_df, min_elev, max_elev):
         print('FEATURE COMING SOON')
         
     elif min_bound == 0:
+        print('AAAAAHHHH')
         for i in range(len(lower_bound_list)):
             lower_bound = lower_bound_list[i]
             upper_bound = upper_bound_list[i]
@@ -95,11 +97,13 @@ def remap_cmap(cmap_df, min_elev, max_elev):
             new_lower_bound_list.append(new_lower_bound)
             new_upper_bound_list.append(new_upper_bound)
             
+        print(new_lower_bound_list) 
         new_bound_df = pd.DataFrame({'Bottom_Bound' : new_lower_bound_list,
                                      'Upper_Bound' : new_upper_bound_list})
         cmap_df['Bottom_Bound'] = new_bound_df['Bottom_Bound']
         cmap_df['Upper_Bound'] = new_bound_df['Upper_Bound']
-    
+    else:
+        print('AAKJSDKAKAKLAA')
     return cmap_df
 
 def isolate_bathymetry(bathy_cmap_df):
@@ -128,15 +132,12 @@ def add_bathymetry(topo_cmap_df,bathy_cmap_df):
 
     return combined_df
 
-
-
 def interpolate_cmap(cmap_df,cuts=10):
     new_df = cmap_df.copy()
     new_df.drop(new_df[new_df.index > 0].index, inplace=True)
     
     for i in range(len(cmap_df)):
         names = ['Bottom_Bound', 'R1', 'G1', 'B1','Upper_Bound', 'R2', 'G2', 'B2']
-        print(f'WORKING ON {i}th RANGE')
         
         if i == 0:
             pass
@@ -167,14 +168,9 @@ def interpolate_cmap(cmap_df,cuts=10):
     
     new_df['Upper_Bound'] = new_upper_bound_df['Upper_Bound']
     
-    print(new_df)
-    print('BREAK"')
-    
     new_df.iat[-2,4] = new_df.iloc[-1,0]
     new_df.iat[-1,4] = 0
     
-    print(new_df)
-            
     return new_df
 
 def save_cmap_df_as_cpt(cmap_df,filepath):
@@ -189,19 +185,22 @@ def save_cmap_df_as_cpt(cmap_df,filepath):
 
 topo_cmap_path = os.path.expanduser('~/Documents/GitHub/Mapping_Resources/Resources/colormaps/usgs.cpt')
 topo_cmap_df = clean_colormap_df(topo_cmap_path)
-topo_cmap_df = remap_cmap(topo_cmap_df,0,2000)
+#topo_cmap_df = remap_cmap(topo_cmap_df,0,2000)
 #topo_cmap_df = interpolate_cmap(topo_cmap_df,20)
 
 bathy_cmap_path = os.path.expanduser('~/Documents/GitHub/Mapping_Resources/Resources/colormaps/colombia.cpt')
 bathy_cmap_df = clean_colormap_df(bathy_cmap_path)
+bathy_cmap_df = remap_cmap(bathy_cmap_df,-8000,0)
+print(bathy_cmap_df)
 bathy_cmap_df = isolate_bathymetry(bathy_cmap_df)
+
 
 
 bathy_cmap_df = interpolate_cmap(bathy_cmap_df,20)
 
-combined_cmap = add_bathymetry(topo_cmap_df, bathy_cmap_df)
+#combined_cmap = add_bathymetry(topo_cmap_df, bathy_cmap_df)
 
-save_cmap_df_as_cpt(combined_cmap,'~/Documents/GitHub/Mapping_Resources/resources/colormaps/combined_test.cpt')
+#save_cmap_df_as_cpt(combined_cmap,'~/Documents/GitHub/Mapping_Resources/resources/colormaps/usgs_bathy_8000_topo_2000.cpt')
 
 
 

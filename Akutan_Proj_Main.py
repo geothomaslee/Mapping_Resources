@@ -35,7 +35,7 @@ cmap = os.path.expanduser('~/Documents/GitHub/Mapping_Resources/Resources/colorm
 
 
 akutan_regional_fig = gm.plot_base_map(akutan_region,projection=projection,
-                                       figure_name='Akutan_Region',
+                                       figure_name='Akutan Region',
                                        cmap=cmap,
                                        bathymetry=True,watercolor='royalblue')
 
@@ -48,17 +48,18 @@ akutan_regional_fig.show()
 
 
 
+cmap = os.path.expanduser('~/Documents/GitHub/Mapping_Resources/Resources/colormaps/usgs_bathy_8000_topo_2000.cpt')
 
 aleutian_region = [-170, -140, 52, 65]
 projection = 'J-65/12c'
 
 aleutian_regional_fig = gm.plot_base_map(aleutian_region,projection=projection,
-                                         figure_name='Akutan_Region',resolution='03m',
-                                         cmap=cmap)
+                                         figure_name='Alaska',resolution='03m',
+                                         cmap=cmap,bathymetry=True)
 
 aleutian_regional_fig = gm.plot_holocene_volcanoes(aleutian_regional_fig)
 
-aleutian_regional_fig = gm.plot_major_cities(aleutian_regional_fig)
+aleutian_regional_fig = gm.plot_major_cities(aleutian_regional_fig,offset=0.05)
 
 aleutian_regional_fig.show()
 

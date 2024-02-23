@@ -203,6 +203,9 @@ def plot_base_map(region,projection="Q15c+du",figure_name="figure!",
     """
     if not watercolor:
         watercolor = "skyblue"
+        
+    if ' ' in figure_name:
+        figure_name = '"' + figure_name + '"'
     
     bounds = get_margin_from_bounds(region,margin=margin)
     

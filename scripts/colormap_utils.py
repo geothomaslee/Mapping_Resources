@@ -7,6 +7,7 @@ Created on Thu Feb 22 11:45:49 2024
 import pandas as pd
 import os
 import numpy as np
+from glob import glob
 
 
 def clean_colormap_df(filepath):
@@ -63,6 +64,7 @@ def remap_cmap(cmap_df, min_elev, max_elev):
     new_lower_bound_list = []
     new_upper_bound_list = []
     
+    # If there is a symmetric bathymetric and topographic component
     if abs(min_bound) == abs(max_bound):
         print('AHJH')
         elev_range = abs(min_bound)
@@ -82,11 +84,12 @@ def remap_cmap(cmap_df, min_elev, max_elev):
         cmap_df['Bottom_Bound'] = new_bound_df['Bottom_Bound']
         cmap_df['Upper_Bound'] = new_bound_df['Upper_Bound']
         
+    # If there is an asymmetric bathymetric and topographic component
     elif abs(min_bound) != abs(max_bound) and asymmetric_bathy_and_topo:
         print('FEATURE COMING SOON')
         
-    elif min_bound == 0:
-        print('AAAAAHHHH')
+    # If there is only bathymetry or topography
+    elif min_bound == 0 or max_bound == 0:
         for i in range(len(lower_bound_list)):
             lower_bound = lower_bound_list[i]
             upper_bound = upper_bound_list[i]
@@ -97,13 +100,10 @@ def remap_cmap(cmap_df, min_elev, max_elev):
             new_lower_bound_list.append(new_lower_bound)
             new_upper_bound_list.append(new_upper_bound)
             
-        print(new_lower_bound_list) 
         new_bound_df = pd.DataFrame({'Bottom_Bound' : new_lower_bound_list,
                                      'Upper_Bound' : new_upper_bound_list})
         cmap_df['Bottom_Bound'] = new_bound_df['Bottom_Bound']
         cmap_df['Upper_Bound'] = new_bound_df['Upper_Bound']
-    else:
-        print('AAKJSDKAKAKLAA')
     return cmap_df
 
 def isolate_bathymetry(bathy_cmap_df):
@@ -111,7 +111,7 @@ def isolate_bathymetry(bathy_cmap_df):
     
     return bathy_cmap_df
 
-def add_bathymetry(topo_cmap_df,bathy_cmap_df):
+def add_bathymetry(topo_cmap_df,bathy_cmap_df,remap=True):
     
     if min(topo_cmap_df['Bottom_Bound'].tolist()) < 0:
         raise ValueError('Topo cmap contains bathymetric data, this function is for topo maps with elevation value 0')
@@ -120,12 +120,13 @@ def add_bathymetry(topo_cmap_df,bathy_cmap_df):
     min_bathy = min(bathy_cmap_df['Bottom_Bound'].tolist())
     max_topo = max(bathy_cmap_df['Upper_Bound'].tolist())
     
-    if abs(min_bathy) > abs(max_topo):
-        topo_cmap_df = remap_cmap(topo_cmap_df,0,abs(min_bathy))
-    elif abs(min_bathy) < abs(max_topo):
-        bathy_cmap_df = remap_cmap(bathy_cmap_df,-abs(max_topo),0)
+    if remap:
+        if abs(min_bathy) > abs(max_topo):
+            topo_cmap_df = remap_cmap(topo_cmap_df,0,abs(min_bathy))
+        elif abs(min_bathy) < abs(max_topo):
+            bathy_cmap_df = remap_cmap(bathy_cmap_df,-abs(max_topo),0)
     else:
-        print('Skipping remap')
+        print('add_bathymetry in colormap_utils: Remap set to False, change to True to auto rescale cmaps to match max scales')
     
     
     combined_df = pd.concat([bathy_cmap_df, topo_cmap_df], ignore_index=True)
@@ -169,7 +170,10 @@ def interpolate_cmap(cmap_df,cuts=10):
     new_df['Upper_Bound'] = new_upper_bound_df['Upper_Bound']
     
     new_df.iat[-2,4] = new_df.iloc[-1,0]
-    new_df.iat[-1,4] = 0
+    if new_df.iloc[-1,0] < 0:
+        new_df.iat[-1,4] = 0
+    else:
+        new_df.iat[-1,4] = cmap_df.iat[-1,4]
     
     return new_df
 
@@ -182,26 +186,56 @@ def save_cmap_df_as_cpt(cmap_df,filepath):
     col_space = [5, 3, 3, 3, 5, 3, 3, 3 ]        
     cmap_df.to_string(filepath, col_space=col_space, index=None,header=False,
                       justify='left')
+    
+def create_combined_color_map(topo_cmap,bathy_cmap,max_elev,max_depth,cmap_dir=None):
+    if not cmap_dir:
+        cmap_dir = '~/Documents/GitHub/Mapping_Resources/resources/colormaps'
+    
+    if '.cpt' in topo_cmap:
+        topo_cmap = topo_cmap[:-4]
+        print(topo_cmap)
+        
+    if '.cpt' in bathy_cmap:
+        bathy_cmap = bathy_cmap[:-4]
+        
+    save_path = os.path.expanduser(cmap_dir) + '/colormap-utils/' + f'topo_{topo_cmap}_{max_elev}_bathy_{bathy_cmap}_{max_depth}' + '.cpt'
+        
+    if not os.path.isfile(topo_cmap):
+        search_str = cmap_dir + '/**/' + topo_cmap + '.cpt'
+        matching_cmap = glob(os.path.expanduser(search_str),recursive=True)
+        if len(matching_cmap) == 0:
+            raise ValueError('Could not find cpt that matches input for topo_filepath')
+        elif len(matching_cmap) > 1:
+            raise ValueError('Found multiple cpts that match input for topo_filepath')
+        else:
+            topo_cmap = matching_cmap[0]
 
-topo_cmap_path = os.path.expanduser('~/Documents/GitHub/Mapping_Resources/Resources/colormaps/usgs.cpt')
-topo_cmap_df = clean_colormap_df(topo_cmap_path)
-#topo_cmap_df = remap_cmap(topo_cmap_df,0,2000)
-#topo_cmap_df = interpolate_cmap(topo_cmap_df,20)
-
-bathy_cmap_path = os.path.expanduser('~/Documents/GitHub/Mapping_Resources/Resources/colormaps/colombia.cpt')
-bathy_cmap_df = clean_colormap_df(bathy_cmap_path)
-bathy_cmap_df = remap_cmap(bathy_cmap_df,-8000,0)
-print(bathy_cmap_df)
-bathy_cmap_df = isolate_bathymetry(bathy_cmap_df)
-
-
-
-bathy_cmap_df = interpolate_cmap(bathy_cmap_df,20)
-
-#combined_cmap = add_bathymetry(topo_cmap_df, bathy_cmap_df)
-
-#save_cmap_df_as_cpt(combined_cmap,'~/Documents/GitHub/Mapping_Resources/resources/colormaps/usgs_bathy_8000_topo_2000.cpt')
-
+    if not os.path.isfile(bathy_cmap):
+        search_str = cmap_dir + '/**/' + bathy_cmap + '.cpt'
+        matching_cmap = glob(os.path.expanduser(search_str),recursive=True)
+        if len(matching_cmap) == 0:
+            raise ValueError('Could not find cpt that matches input for topo_filepath')
+        elif len(matching_cmap) > 1:
+            raise ValueError('Found multiple cpts that match input for topo_filepath')
+        else:
+            bathy_cmap = matching_cmap[0]
+            
+    topo_cmap_df = clean_colormap_df(topo_cmap)
+    topo_cmap_df = remap_cmap(topo_cmap_df,0,max_elev)
+    topo_cmap_df = interpolate_cmap(topo_cmap_df,20)
+    
+    bathy_cmap_df = clean_colormap_df(bathy_cmap)
+    bathy_cmap_df = isolate_bathymetry(bathy_cmap_df)
+    bathy_cmap_df = remap_cmap(bathy_cmap_df,max_depth,0)
+    bathy_cmap_df = interpolate_cmap(bathy_cmap_df,20)
+    
+    combined_cmap_df = add_bathymetry(topo_cmap_df, bathy_cmap_df,remap=False)
+    
+    save_cmap_df_as_cpt(combined_cmap_df,save_path)
+    
+    return save_path
+        
+cmap = create_combined_color_map('usgs','colombia',4000,-8000)
 
 
 

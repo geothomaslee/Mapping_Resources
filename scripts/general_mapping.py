@@ -13,7 +13,7 @@ import os
 import pandas as pd
 import pygmt
 import numpy as np
-import shutil
+
 
 resource_folder = os.path.join(os.path.dirname(__file__),'../resources')
 
@@ -171,9 +171,9 @@ def find_elevation_range(grid):
 
 def plot_base_map(region,projection="Q15c+du",figure_name="figure!",
                   resolution='03s',
-                  cmap="./Resources/colormaps/colombia.cpt",
+                  cmap="./Resources/colormaps/cpt-city/colombia.cpt",
                   box_bounds=None,margin=0.1,bathymetry=False,
-                  watercolor=None):
+                  watercolor=None,colorbar_tick=2000):
     """
     Parameters
     ----------
@@ -188,7 +188,7 @@ def plot_base_map(region,projection="Q15c+du",figure_name="figure!",
         Resolution of topo data. See pygmt.load_earth_relief for more. 
         The default is '03s'.
     cmap : string, optional
-        Path to colormap. The default is "./Resources/colormaps/colombia.cpt".
+        Path to colormap. The default is "./Resources/colormaps/cpt-city/colombia.cpt".
     box_bounds : list of ints or floats, optional
         Bounds of box to draw on figure. If none given, none will be drawn.
     margin : float or int, optional
@@ -211,8 +211,6 @@ def plot_base_map(region,projection="Q15c+du",figure_name="figure!",
     
     grid = pygmt.datasets.load_earth_relief(resolution=resolution, region=bounds)
     
-
-    
     fig = pygmt.Figure()
     fig.basemap(region=bounds,
                 projection=projection,
@@ -221,7 +219,7 @@ def plot_base_map(region,projection="Q15c+du",figure_name="figure!",
                  projection=projection,
                  frame=["a",f'+t{figure_name}'],
                  cmap=cmap)
-    fig.colorbar(frame=["a1000", "x+lElevation", "y+lm"])
+    fig.colorbar(frame=[f"a{colorbar_tick}", "x+lElevation", "y+lm"])
     if not bathymetry:
         fig.coast(shorelines="4/0.5p,black",
                   projection=projection,

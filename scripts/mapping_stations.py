@@ -211,7 +211,8 @@ def plot_stations(inventory,fig=None,projection="Q15c+du",figure_name="figure!",
                   resolution='03s',region=None,
                   cmap="./Resources/colormaps/colombia.cpt",
                   box_bounds=None,margin=0.1,
-                  plot_holo_vol=False,outside_stats_small=True):
+                  plot_holo_vol=False,outside_stats_small=True,
+                  bathymetry=True,colorbar_tick=1000):
     """
     Parameters
     ----------
@@ -240,6 +241,8 @@ def plot_stations(inventory,fig=None,projection="Q15c+du",figure_name="figure!",
     outside_stats_small : bool, optional
         If True and a bounding box has been specified, then will make stations
         outside the bounding box smaller.
+    bathymetry : bool
+        If False, will replace oceans with solid color. Default is false.
 
     Returns
     -------
@@ -247,9 +250,6 @@ def plot_stations(inventory,fig=None,projection="Q15c+du",figure_name="figure!",
         PyGMT figure with plotted data.
 
     """
-    
-    if __name__ == '__main__':
-        cmap="../Resources/colormaps/colombia.cpt",
         
     if outside_stats_small == True:
         if box_bounds == None:
@@ -273,11 +273,16 @@ def plot_stations(inventory,fig=None,projection="Q15c+du",figure_name="figure!",
                      projection=projection,
                      frame=["a",f'+t{figure_name}'],
                      cmap=cmap)
+        fig.colorbar(frame=[f"a{colorbar_tick}", "x+lElevation", "y+lm"])
         fig.coast(shorelines="4/0.5p,black",
                   projection=projection,
-                  borders="2/1.2p,black",
-                  water="skyblue",
-                  resolution="f")
+                  borders="2/1.2p,black")
+        if not bathymetry:
+            fig.coast(shorelines="4/0.5p,black",
+                      projection=projection,
+                      borders="2/1.2p,black",
+                      water="skyblue",
+                      resolution="f")
     
     
     colors = ["cyan","yellow","green","blue","purple","orange","red"]

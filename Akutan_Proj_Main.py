@@ -8,6 +8,7 @@ Created on Tue Feb 20 14:45:59 2024
 import scripts.general_mapping as gm
 import scripts.mapping_gps as mg
 import scripts.colormap_utils as cu
+from glob import glob
 
 akutan_region = [-167.8, -162.6, 53.2, 55.1]
 akutan_island_bounds = [-166.1464,-165.6164,54.0402,54.2301]
@@ -15,19 +16,19 @@ projection = 'J-65/12c'
         
 #-----------------------------------
 
-ak_dir =  '~/Documents/Grad School/Spring 2024/PHYS581/Alaska_Project/Xue_Data/gps'
-stat_files = mg.find_files_in_bounds(ak_dir,akutan_island_bounds,'.pfiles')
-stat_df = mg.make_gps_station_df(stat_files)
+filelist = glob('C:/Users/tlee4/Documents/Grad School/Spring 2024/PHYS581/Alaska_Project/Xue_Data/gps/Akutan_Stations/*')
+station_df = mg.make_gps_station_df(filelist)
 
 cmap = cu.create_combined_color_map('usgs','colombia',max_elev=2000,max_depth=-1000)
 akutan_island_fig = gm.plot_base_map(akutan_island_bounds,projection=projection,
                                      resolution='03s',cmap=cmap,figure_name='Akutan Island',
                                      bathymetry=True, colorbar_tick=500)
 
-akutan_island_fig = mg.plot_gps_displacement_vectors(akutan_island_fig,stat_df,
-                                                     scaling_factor=1000000)
 
-#akutan_island_fig = mg.plot_gps_stations(akutan_island_fig,stat_df)
+#akutan_island_fig = mg.plot_gps_displacement_vectors(akutan_island_fig,stat_df,
+#                                                     scaling_factor=1000000)
+
+akutan_island_fig = mg.plot_gps_stations(akutan_island_fig,station_df)
 
 akutan_island_fig.show()
 

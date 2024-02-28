@@ -15,6 +15,27 @@ import pyproj
 
 
 def find_files_in_bounds(directory,bounds,filetype=None):
+    """
+    If given a file directory containing GPS files and lat/lon boundaries in the
+    form [min_lon,max_lon,min_lat,max_lat], will read in the GPS files and figure
+    out which ones are in the boundaries.
+    
+    
+    Parameters
+    ----------
+    directory : str
+        The name of the directory containing GPS files.
+    bounds : list
+        Boundaries to search for stations, in the form [min_lon,max_lon,min_lat,max_lat].
+    filetype : str, optional
+        File extension of the GPS files. The default is None.
+
+    Returns
+    -------
+    inside_stat_list : list
+        List of filepaths to files that are inside the desired bounds.
+
+    """
     min_lon = bounds[0]
     max_lon = bounds[1]
     min_lat = bounds[2]
@@ -56,6 +77,15 @@ def find_files_in_bounds(directory,bounds,filetype=None):
     return inside_stat_list
 
 def set_aside_inside_stat_list(inside_stat_file_list,folder_name=None):
+    """
+    Parameters
+    ----------
+    inside_stat_file_list : list
+        List of file paths to the files to set aside.
+    folder_name : str, optional
+        The folder name to put the desired stations in. The default is None.
+
+    """
     if not folder_name:
         folder_name = 'Stations_In_Bounds'
     set_aside_directory = os.path.split(inside_stat_file_list[0])[0] + f'/{folder_name}'
@@ -67,7 +97,21 @@ def set_aside_inside_stat_list(inside_stat_file_list,folder_name=None):
         shutil.copy(file,set_aside_directory)
         
 def make_gps_station_df(filelist):
-    # FOR PLOTTING THE INITIAL STATION POSITIONS
+    """
+    Makes a DataFrame containing the initial positions of the GPS stations,
+    primarily for plotting purposes.
+
+    Parameters
+    ----------
+    filelist : list
+        List of filepaths to GPS files.
+
+    Returns
+    -------
+    stat_df : pandas.DataFrame
+        DataFrame containing GPS station info.
+
+    """
     file_name = os.path.split(filelist[0])[1]
     
     lon_list = []
@@ -85,8 +129,6 @@ def make_gps_station_df(filelist):
             lat_list.append(stat_df.iloc[0,4])
 
             
-    # Do same as above but with different file format
-            
     stat_df = pd.DataFrame({'Station' : stat_list,
                             'Longitude' : lon_list,
                             'Latitude' : lat_list})
@@ -96,7 +138,25 @@ def make_gps_station_df(filelist):
 
 def make_gps_station_displacement_df(filelist):
     """
-    THIS ONE CANNOT DO IT RELATIVE TO A REFERENCE FRAME, JUST ABSOLUTE CHANGES
+    Makes a DataFrame containing GPS initial positions and their total 
+    displacement over the entire time span given in the GPS file. Useful for 
+    seeing absolute deformation, but not local deformation. Ex. stations on a
+    volcanic island in a subduction zone will have their absolute motion 
+    dominanted by the convergence rate of the subduction zone, not the 
+    actual deformation from the volcanic edifice.
+    
+    Parameters
+    ----------
+    filelist : list
+        List of filepaths to GPS files of interest.
+
+    Returns
+    -------
+    stat_df : pandas.DataFrame
+        DataFrame containing GPS initial positions and their total displacement
+        over the entire time span given in the GPS file. Useful for seeing
+        absolute deformation, but not local deformation. Ex. stations on a
+        volcanic island in a subduction zone will have their absolute motion
     """
     file_name = os.path.split(filelist[0])[1]
     
@@ -132,9 +192,22 @@ def make_gps_station_displacement_df(filelist):
     return stat_df
 
 def make_gps_relative_displacement_df(filelist,ref_station,starttime=None,endtime=None):
-    pass
     """
-    FOR NOW ONLY CAN READ .PFILES
+    Parameters
+    ----------
+    filelist : TYPE
+        DESCRIPTION.
+    ref_station : TYPE
+        DESCRIPTION.
+    starttime : TYPE, optional
+        DESCRIPTION. The default is None.
+    endtime : TYPE, optional
+        DESCRIPTION. The default is None.
+
+    Returns
+    -------
+    None.
+
     """
     # ref_station is a station code
     # For every station, we calculate the displacement relative to the ref station at
@@ -231,7 +304,24 @@ make_gps_relative_displacement_df(filelist,'AKMO')
     
         
 def plot_gps_stations(fig,stat_df,fill='black'):
-    
+    """
+    Parameters
+    ----------
+    fig : pygmt.Figure
+        PyGMT figure, see scripts.general_mapping.plot_base_map for a
+        convenient base figure to start with.
+    stat_df : pandas.DataFrame
+        Pandas DataFrame with columns 'Latitude' and 'Longitude'. All other
+        columns don't matter.
+    fill : str, optional
+        Color to fill station symbols with. The default is 'black'.
+
+    Returns
+    -------
+    fig : pygmt.Figure
+        Input figure with stations drawn on top.
+
+    """
     xvals = stat_df['Longitude']
     yvals = stat_df['Latitude']
 
@@ -243,6 +333,24 @@ def plot_gps_stations(fig,stat_df,fill='black'):
     return fig
 
 def plot_gps_displacement_vectors(fig,stat_df,scaling_factor=1000):
+    """
+    Parameters
+    ----------
+    fig : pygmt.Figure
+        PyGMT figure, see scripts.general_mapping.plot_base_map for a
+        convenient base figure to start with.
+    stat_df : pandas.DataFrame
+        Pandas DataFrame with columns 'Latitude','Longitude','E_Disp', 'N_Disp'.
+        All other columns don't matter.
+    scaling_factor : int or float, optional
+        Multiplier of the vector length. The default is 1000.
+
+    Returns
+    -------
+    fig : pygmt.Figure
+        Input figure with velocity vectors drawn on top.
+
+    """
     lats = stat_df['Latitude'].tolist()
     lons = stat_df['Longitude'].tolist()
     e_disp = stat_df['E_Disp'].tolist()
@@ -264,7 +372,6 @@ def plot_gps_displacement_vectors(fig,stat_df,scaling_factor=1000):
              pen="2p",
              color="red3")
             
-
     return fig
 
     

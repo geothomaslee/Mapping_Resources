@@ -25,10 +25,14 @@ akutan_island_fig = gm.plot_base_map(akutan_island_bounds,projection=projection,
                                      bathymetry=True, colorbar_tick=500)
 
 
+
+df_dict = mg.make_gps_relative_displacement_df_dict (filelist,'AKMO')
+vel_dict = mg.velocity_fits_from_dict(df_dict)
+
 #akutan_island_fig = mg.plot_gps_displacement_vectors(akutan_island_fig,stat_df,
 #                                                     scaling_factor=1000000)
 
-akutan_island_fig = mg.plot_gps_stations(akutan_island_fig,station_df)
+#akutan_island_fig = mg.plot_gps_stations(akutan_island_fig,station_df)
 
 akutan_island_fig.show()
 

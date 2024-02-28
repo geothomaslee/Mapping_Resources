@@ -304,7 +304,7 @@ def make_gps_relative_displacement_df_dict(filelist,ref_station,
                     lon_disp.append(0)
                     lat_disp.append(0)
                     
-                    initial_height_diff = ref_height_at_time - stat_height[i]
+                    initial_height = stat_height[i]
                     height_disp.append(0)
                 else:
                     current_lon_diff = distance.distance([ref_lat_at_time,ref_lon_at_time],
@@ -317,13 +317,12 @@ def make_gps_relative_displacement_df_dict(filelist,ref_station,
                     lat_displacement = current_lat_diff - initial_lat_diff
                     lat_disp.append(lat_displacement)
                     
-                    current_height_diff = ref_height_at_time - stat_height[i]
-                    height_displacement = initial_height_diff - current_height_diff
+                    height_displacement = stat_height[i] - initial_height
                     height_disp.append(height_displacement)
                     
-            lon_disp = [x * 100000 for x in lon_disp]
-            lat_disp = [x * 100000 for x in lat_disp]
-            height_disp = [x * 1000 for x in height_disp]
+            lon_disp = [x * -100000 for x in lon_disp]
+            lat_disp = [x * -100000 for x in lat_disp]
+            height_disp = [x * -1000 for x in height_disp]
         
             if plot_lons:
                 plt.plot(stat_times,lon_disp)
@@ -352,50 +351,74 @@ def make_gps_relative_displacement_df_dict(filelist,ref_station,
             current_station_df = pd.DataFrame({'Time' : stat_times,
                                                'E_Disp' : lon_disp,
                                                'N_Disp' : lat_disp,
-                                               'Vert_Disp' : height_disp})
+                                               'H_Disp' : height_disp})
             
             df_dict[stat_name] = current_station_df
             
     return df_dict
                 
 def velocity_fits_from_dict(gps_disp_dict,max_degree_to_test=4):
+    vel_dict = {}
     for station in gps_disp_dict:
         stat_dict = gps_disp_dict[station]
         
         times = stat_dict['Time'].tolist()
         E_Disp = stat_dict['E_Disp'].tolist()
         N_Disp = stat_dict['N_Disp'].tolist()
-        Vert_Disp = stat_dict['Vert_Disp'].tolist()
+        H_Disp = stat_dict['H_Disp'].tolist()
         
-        """ Interesting but I don't think it does anything useful
-        for i in np.arange(1,max_degree_to_test+1,1):
-            residual = np.polyfit(times,E_Disp,i,full=True)[1]
-            if residual:
-                if i == 1:
-                    best_degree = i
-                    best_residual = residual
-                else:
-                    if residual < best_residual:
-                        best_degree = i
-                        
-        print(f'BEST DEGREE: {best_degree} for {station}')
-        """
-                        
+        E_Vel = np.polyfit(times,E_Disp,1)[0]
+        N_Vel = np.polyfit(times,N_Disp,1)[0]
+        H_Vel = np.polyfit(times,H_Disp,1)[0]
         
+        vels = [E_Vel,N_Vel,H_Vel]
+        vel_dict[station] = vels
         
-        
-        
-        
-filelist = glob('C:/Users/tlee4/Documents/Grad School/Spring 2024/PHYS581/Alaska_Project/Xue_Data/gps/Akutan_Stations/*')
-df_dict = make_gps_relative_displacement_df_dict (filelist,'AKMO')
-velocity_fits_from_dict(df_dict)
-
-
-
-
-
     
+    return vel_dict
+
+def plot_gps_velocity_vectors(fig,stat_df,vel_dict,scaling_factor=1000):
+    """
+    Parameters
+    ----------
+    fig : pygmt.Figure
+        PyGMT figure, see scripts.general_mapping.plot_base_map for a
+        convenient base figure to start with.
+    stat_df : pandas.DataFrame
+        Pandas DataFrame with columns 'Latitude','Longitude','E_Disp', 'N_Disp'.
+        All other columns don't matter.
+    scaling_factor : int or float, optional
+        Multiplier of the vector length. The default is 1000.
+
+    Returns
+    -------
+    fig : pygmt.Figure
+        Input figure with velocity vectors drawn on top.
+
+    """
+    lats = stat_df['Latitude'].tolist()
+    lons = stat_df['Longitude'].tolist()
+    e_disp = stat_df['E_Disp'].tolist()
+    n_disp = stat_df['N_Disp'].tolist()
+    
+    angle_list = []
+    length_list = []
+    for i in range(len(e_disp)):
+        angle_list.append(np.rad2deg(np.arctan(n_disp[i]/e_disp[i])))
+        length_list.append((e_disp[i]**2 + n_disp[i]**2)**0.5)
         
+    length_list = [val*scaling_factor for val in length_list]
+        
+
+    fig.plot(x=lons,
+             y=lats,
+             style="v0.6c+e",
+             direction=[angle_list, length_list],
+             pen="2p",
+             color="red3")
+            
+    return fig
+
 def plot_gps_stations(fig,stat_df,fill='black'):
     """
     Parameters

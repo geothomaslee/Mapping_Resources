@@ -227,7 +227,6 @@ def make_gps_relative_displacement_df_dict(filelist,ref_station,
     for file in filelist:
         if ref_station in file:
             ref_file = file
-    print(f'REF FILE {ref_file}')
         
     cols = ['Time','Station_Name','Period','Longitude','Latitude','Height','E_Uncer','N_Uncer','H_Uncer',
                 'E-N_Corr,','E-H_Corr','N-H_Corr']
@@ -271,9 +270,8 @@ def make_gps_relative_displacement_df_dict(filelist,ref_station,
     df_dict = {}
     for file in filelist:
         if file == ref_file:
-            print('Passing on ref file')
+            pass
         else:
-            print(f'WORKING ON FILE {file}')
             cols = ['Time','Station_Name','Period','Longitude','Latitude','Height','E_Uncer','N_Uncer','H_Uncer',
                         'E-N_Corr,','E-H_Corr','N-H_Corr']
                 
@@ -352,23 +350,46 @@ def make_gps_relative_displacement_df_dict(filelist,ref_station,
                 plt.show()
                 
             current_station_df = pd.DataFrame({'Time' : stat_times,
-                                               'Longitudinal_Displacement' : lon_disp,
-                                               'Latitudinal_Displacement' : lat_disp,
-                                               'Vertical_Displacement' : height_disp})
+                                               'E_Disp' : lon_disp,
+                                               'N_Disp' : lat_disp,
+                                               'Vert_Disp' : height_disp})
             
             df_dict[stat_name] = current_station_df
             
     return df_dict
                 
+def velocity_fits_from_dict(gps_disp_dict,max_degree_to_test=4):
+    for station in gps_disp_dict:
+        stat_dict = gps_disp_dict[station]
+        
+        times = stat_dict['Time'].tolist()
+        E_Disp = stat_dict['E_Disp'].tolist()
+        N_Disp = stat_dict['N_Disp'].tolist()
+        Vert_Disp = stat_dict['Vert_Disp'].tolist()
+        
+        """ Interesting but I don't think it does anything useful
+        for i in np.arange(1,max_degree_to_test+1,1):
+            residual = np.polyfit(times,E_Disp,i,full=True)[1]
+            if residual:
+                if i == 1:
+                    best_degree = i
+                    best_residual = residual
+                else:
+                    if residual < best_residual:
+                        best_degree = i
+                        
+        print(f'BEST DEGREE: {best_degree} for {station}')
+        """
+                        
+        
+        
+        
+        
         
 filelist = glob('C:/Users/tlee4/Documents/Grad School/Spring 2024/PHYS581/Alaska_Project/Xue_Data/gps/Akutan_Stations/*')
-df_dict = make_gps_relative_displacement_df_dict (filelist,'AKMO',plot_lats=True)
+df_dict = make_gps_relative_displacement_df_dict (filelist,'AKMO')
+velocity_fits_from_dict(df_dict)
 
-test_df = make_gps_station_df(filelist)
-lon1 = test_df.iloc[0,1]
-lat1 = test_df.iloc[0,2]
-lon2 = test_df.iloc[1,1]
-lat2 = test_df.iloc[1,2]
 
 
 

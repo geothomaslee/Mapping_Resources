@@ -95,6 +95,9 @@ def make_gps_station_df(filelist):
         
 
 def make_gps_station_displacement_df(filelist):
+    """
+    THIS ONE CANNOT DO IT RELATIVE TO A REFERENCE FRAME, JUST ABSOLUTE CHANGES
+    """
     file_name = os.path.split(filelist[0])[1]
     
     lon_list = []
@@ -171,15 +174,16 @@ def make_gps_relative_displacement_df(filelist,ref_station,starttime=None,endtim
     
     for file in filelist:
         if file == ref_file:
-            pass
+            print('Passing on ref file')
         else:
+            print(f'WORKING ON FILE {file}')
             cols = ['Time','Station_Name','Period','Longitude','Latitude','Height','E_Uncer','N_Uncer','H_Uncer',
                         'E-N_Corr,','E-H_Corr','N-H_Corr']
                 
-            stat_df = pd.read_csv(ref_file,delim_whitespace=True,names=cols)
+            stat_df = pd.read_csv(file,delim_whitespace=True,names=cols)
             stat_df = stat_df.drop(columns=['Period'])
             
-            stat_df = 
+            stat_name = stat_df['Station_Name'].tolist()[0]
             stat_lon = stat_df['Longitude'].tolist()
             stat_lat = stat_df['Latitude'].tolist()
             stat_times = stat_df['Time'].tolist()
@@ -189,17 +193,27 @@ def make_gps_relative_displacement_df(filelist,ref_station,starttime=None,endtim
             
             for i,time in enumerate(stat_times):
                 ref_lon_at_time = ref_lon_poly(time)
+                ref_lat_at_time = ref_lat_poly(time)
                 if i == 0:
                     initial_lon_diff = ref_lon_at_time - stat_lon[i]
+                    initial_lat_diff = ref_lat_at_time - stat_lat[i]
                     lon_disp.append(0)
-                    print('INITIAL DIFF: ')
-                    print(initial_lon_diff)
+                    lat_disp.append(0)
                 else:
                     current_lon_diff = ref_lon_at_time - stat_lon[i]
-                    total_displacement = initial_lon_diff - current_lon_diff
-                    lon_disp.append(total_displacement)
+                    lon_displacement = initial_lon_diff - current_lon_diff
+                    lon_disp.append(lon_displacement)
+                    
+                    current_lat_diff = ref_lat_at_time - stat_lat[i]
+                    lat_displacement = initial_lat_diff - current_lat_diff
+                    lat_disp.append(lat_displacement)
       
-            plt.plot(ref_times,lon_disp)
+            plt.plot(stat_times,lon_disp)
+            plt.plot(stat_times,lon_disp,'o')
+            plt.title(f'Longitudinal Displacement at {stat_name} Relative to {ref_station}')
+            plt.ylabel('Longitude Change')
+            plt.xlabel('Time')
+            plt.show()
                 
         
             

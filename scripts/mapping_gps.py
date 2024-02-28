@@ -11,7 +11,7 @@ from glob import glob
 import numpy as np
 import shutil
 import matplotlib.pyplot as plt
-import pyproj
+from geopy import distance
 
 
 def find_files_in_bounds(directory,bounds,filetype=None):
@@ -116,6 +116,7 @@ def make_gps_station_df(filelist):
     
     lon_list = []
     lat_list = []
+    height_list = []
     stat_list = []
     
     if '.pfiles' in file_name:
@@ -127,11 +128,12 @@ def make_gps_station_df(filelist):
             stat_list.append(stat_df.iloc[0,1])
             lon_list.append(stat_df.iloc[0,3])
             lat_list.append(stat_df.iloc[0,4])
-
+            height_list.append(stat_df.iloc[0,5])
             
     stat_df = pd.DataFrame({'Station' : stat_list,
                             'Longitude' : lon_list,
-                            'Latitude' : lat_list})
+                            'Latitude' : lat_list,
+                            'Height' : height_list})
     
     return stat_df
         
@@ -191,31 +193,41 @@ def make_gps_station_displacement_df(filelist):
     
     return stat_df
 
-def make_gps_relative_displacement_df(filelist,ref_station,starttime=None,endtime=None):
+def make_gps_relative_displacement_df_dict(filelist,ref_station,
+                                           plot_lats=False,plot_lons=False,
+                                           plot_elevs=False,plot_ref=False):
     """
     Parameters
     ----------
-    filelist : TYPE
-        DESCRIPTION.
-    ref_station : TYPE
-        DESCRIPTION.
-    starttime : TYPE, optional
-        DESCRIPTION. The default is None.
-    endtime : TYPE, optional
-        DESCRIPTION. The default is None.
+    filelist : list of str
+        List of GPS files to include. Currently can only read .pfiles.
+    ref_station : str
+        Name of reference station.
+    plot_lats : bool, optional
+        Will produce a figure showing the latitudinal displacement for every
+        station. The default is False.
+    plot_lons : bool, optional
+        Will produce a figure showing the longitudinal displacement for every
+        station. The default is False.
+    plot_elevs : bool, optional
+        Will produce a figure showing the elevation displacement for every
+        station. The default is False.
+    plot_ref : bool, optional
+        Will plot the absolute GPS positions over time for the reference station
+        in question. The default is False.
 
     Returns
     -------
-    None.
-
+    df_dict : dict
+        A dictionary where each key is a station name and the value is a 
+        corresponding Pandas DataFrame. The DataFrame contains the 
+        displacement of each station over time, in millimeters, relative to 
+        the reference station.
     """
-    # ref_station is a station code
-    # For every station, we calculate the displacement relative to the ref station at
-    # every time stamp (at least the ones within the timeframe)
-    
     for file in filelist:
         if ref_station in file:
             ref_file = file
+    print(f'REF FILE {ref_file}')
         
     cols = ['Time','Station_Name','Period','Longitude','Latitude','Height','E_Uncer','N_Uncer','H_Uncer',
                 'E-N_Corr,','E-H_Corr','N-H_Corr']
@@ -225,6 +237,7 @@ def make_gps_relative_displacement_df(filelist,ref_station,starttime=None,endtim
     
     ref_lon = ref_df['Longitude'].tolist()
     ref_lat = ref_df['Latitude'].tolist()
+    ref_height = ref_df['Height'].tolist()
     ref_times= ref_df['Time'].tolist()
     
     ref_lat_fit = np.polyfit(ref_times,ref_lat,1)
@@ -233,18 +246,29 @@ def make_gps_relative_displacement_df(filelist,ref_station,starttime=None,endtim
     ref_lon_fit = np.polyfit(ref_times,ref_lon,1)
     ref_lon_poly = np.poly1d(ref_lon_fit)
     
-    plt.plot(ref_times,ref_lat,'.',ref_times,ref_lat_poly(ref_times),'--')
-    plt.ylabel('Latitude')
-    plt.xlabel('Time')
-    plt.title('Reference Station Latitude Over Time AKMO')
-    plt.show()
+    ref_height_fit = np.polyfit(ref_times,ref_height,1)
+    ref_height_poly = np.poly1d(ref_height_fit)
     
-    plt.plot(ref_times,ref_lon,'.',ref_times,ref_lon_poly(ref_times),'--')
-    plt.ylabel('Latitude')
-    plt.xlabel('Time')
-    plt.title('Reference Station Longitude Over Time AKMO')
-    plt.show()
-    
+    if plot_ref:
+        plt.plot(ref_times,ref_height,'.',ref_times,ref_height_poly(ref_times),'--')
+        plt.ylabel('Elevation')
+        plt.xlabel('Time')
+        plt.title(f'Reference Station Elevation Over Time {ref_station}')
+        plt.show()
+        
+        plt.plot(ref_times,ref_lon,'.',ref_times,ref_lon_poly(ref_times),'--')
+        plt.ylabel('Latitude')
+        plt.xlabel('Time')
+        plt.title(f'Reference Station Longitude Over Time {ref_station}')
+        plt.show()
+        
+        plt.plot(ref_times,ref_lat,'.',ref_times,ref_lat_poly(ref_times),'--')
+        plt.ylabel('Latitude')
+        plt.xlabel('Time')
+        plt.title(f'Reference Station Latitude Over Time {ref_station}')
+        plt.show()
+
+    df_dict = {}
     for file in filelist:
         if file == ref_file:
             print('Passing on ref file')
@@ -259,48 +283,96 @@ def make_gps_relative_displacement_df(filelist,ref_station,starttime=None,endtim
             stat_name = stat_df['Station_Name'].tolist()[0]
             stat_lon = stat_df['Longitude'].tolist()
             stat_lat = stat_df['Latitude'].tolist()
+            stat_height = stat_df['Height'].tolist()
             stat_times = stat_df['Time'].tolist()
             
             lon_disp = []
             lat_disp = []
+            height_disp = []
             
             for i,time in enumerate(stat_times):
                 ref_lon_at_time = ref_lon_poly(time)
                 ref_lat_at_time = ref_lat_poly(time)
+                ref_height_at_time = ref_height_poly(time)
                 if i == 0:
-                    initial_lon_diff = ref_lon_at_time - stat_lon[i]
-                    initial_lat_diff = ref_lat_at_time - stat_lat[i]
+                    
+                    
+                    # Fix lon and calculate lat diff
+                    initial_lat_diff = distance.distance([ref_lat_at_time,ref_lon_at_time],
+                                                         [stat_lat[i],ref_lon_at_time]).km
+                    # FIx lat and calculate lon diff
+                    initial_lon_diff = distance.distance([ref_lat_at_time,ref_lon_at_time],
+                                                         [ref_lat_at_time,stat_lon[i]]).km
                     lon_disp.append(0)
                     lat_disp.append(0)
+                    
+                    initial_height_diff = ref_height_at_time - stat_height[i]
+                    height_disp.append(0)
                 else:
-                    current_lon_diff = ref_lon_at_time - stat_lon[i]
-                    lon_displacement = initial_lon_diff - current_lon_diff
+                    current_lon_diff = distance.distance([ref_lat_at_time,ref_lon_at_time],
+                                                         [ref_lat_at_time,stat_lon[i]]).km
+                    lon_displacement = current_lon_diff - initial_lon_diff
                     lon_disp.append(lon_displacement)
                     
-                    current_lat_diff = ref_lat_at_time - stat_lat[i]
-                    lat_displacement = initial_lat_diff - current_lat_diff
+                    current_lat_diff = distance.distance([ref_lat_at_time,ref_lon_at_time],
+                                                         [stat_lat[i],ref_lon_at_time]).km
+                    lat_displacement = current_lat_diff - initial_lat_diff
                     lat_disp.append(lat_displacement)
-      
-            plt.plot(stat_times,lon_disp)
-            plt.plot(stat_times,lon_disp,'o')
-            plt.title(f'Longitudinal Displacement at {stat_name} Relative to {ref_station}')
-            plt.ylabel('Longitude Change')
-            plt.xlabel('Time')
-            plt.show()
+                    
+                    current_height_diff = ref_height_at_time - stat_height[i]
+                    height_displacement = initial_height_diff - current_height_diff
+                    height_disp.append(height_displacement)
+                    
+            lon_disp = [x * 100000 for x in lon_disp]
+            lat_disp = [x * 100000 for x in lat_disp]
+            height_disp = [x * 1000 for x in height_disp]
+        
+            if plot_lons:
+                plt.plot(stat_times,lon_disp)
+                plt.plot(stat_times,lon_disp,'o')
+                plt.title(f'East Displacement at {stat_name} Relative to {ref_station}')
+                plt.ylabel('East Displacement (mm)')
+                plt.xlabel('Time')
+                plt.show()
+                
+            if plot_lats:
+                plt.plot(stat_times,lat_disp)
+                plt.plot(stat_times,lat_disp,'o')
+                plt.title(f'North Displacement at {stat_name} Relative to {ref_station}')
+                plt.ylabel('North Displacement (mm)')
+                plt.xlabel('Time')
+                plt.show()
+                
+            if plot_elevs:
+                plt.plot(stat_times,height_disp)
+                plt.plot(stat_times,height_disp,'o')
+                plt.title(f'Vertical Displacement at {stat_name} Relative to {ref_station}')
+                plt.ylabel('Vertical Change (mm)')
+                plt.xlabel('Time')
+                plt.show()
+                
+            current_station_df = pd.DataFrame({'Time' : stat_times,
+                                               'Longitudinal_Displacement' : lon_disp,
+                                               'Latitudinal_Displacement' : lat_disp,
+                                               'Vertical_Displacement' : height_disp})
+            
+            df_dict[stat_name] = current_station_df
+            
+    return df_dict
                 
         
-            
-    
-
-    
-    
-    
-
-    
-    
-
 filelist = glob('C:/Users/tlee4/Documents/Grad School/Spring 2024/PHYS581/Alaska_Project/Xue_Data/gps/Akutan_Stations/*')
-make_gps_relative_displacement_df(filelist,'AKMO')
+df_dict = make_gps_relative_displacement_df_dict (filelist,'AKMO',plot_lats=True)
+
+test_df = make_gps_station_df(filelist)
+lon1 = test_df.iloc[0,1]
+lat1 = test_df.iloc[0,2]
+lon2 = test_df.iloc[1,1]
+lat2 = test_df.iloc[1,2]
+
+
+
+
     
         
 def plot_gps_stations(fig,stat_df,fill='black'):

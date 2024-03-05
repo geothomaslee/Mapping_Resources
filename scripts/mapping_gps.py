@@ -136,8 +136,105 @@ def make_gps_station_df(filelist):
                             'Height' : height_list})
     
     return stat_df
-        
 
+
+def make_gps_station_displacement_df_degrandpre(filelist,starttime,endtime,
+                                                ref_station='AV15'):
+    for file in filelist:
+        if ref_station in file:
+            ref_file = file
+        
+    cols = ['Time','Station_Name','Period','Longitude','Latitude','Height','E_Uncer','N_Uncer','H_Uncer',
+                'E-N_Corr,','E-H_Corr','N-H_Corr']
+        
+    ref_df = pd.read_csv(ref_file,delim_whitespace=True,names=cols)
+    ref_df = ref_df.drop(columns=['Period'])
+    
+    ref_lon = ref_df['Longitude'].tolist()
+    ref_lat = ref_df['Latitude'].tolist()
+    ref_height = ref_df['Height'].tolist()
+    ref_times= ref_df['Time'].tolist()
+    
+    ref_lat_fit = np.polyfit(ref_times,ref_lat,1)
+    ref_lat_vel = ref_lat_fit[0]
+    
+    ref_lon_fit = np.polyfit(ref_times,ref_lon,1)
+    ref_lon_vel = ref_lon_fit[0]
+    
+    ref_height_fit = np.polyfit(ref_times,ref_height,1)
+    ref_height_vel = ref_height_fit[0]
+    
+    time_window = endtime-starttime
+    
+    disps = {}
+    for file in filelist:
+        if ref_station in file:
+            pass
+        else:
+            cols = ['Time','Station_Name','Period','Longitude','Latitude','Height','E_Uncer','N_Uncer','H_Uncer',
+                        'E-N_Corr,','E-H_Corr','N-H_Corr']
+                
+            stat_df = pd.read_csv(file,delim_whitespace=True,names=cols)
+            stat_df = stat_df.drop(columns=['Period'])
+            station = stat_df.iloc[0,1]
+            print(station)
+            
+            lons = stat_df['Longitude'].tolist()
+            lats = stat_df['Latitude'].tolist()
+            heights = stat_df['Height'].tolist()
+            times= stat_df['Time'].tolist()
+            
+            start_lon = lons[0]
+            start_lat = lats[0]
+            
+            lat_fit = np.polyfit(times,lats,1)
+            lat_vel = lat_fit[0]
+            
+            lon_fit = np.polyfit(times,lons,1)
+            lon_vel = lon_fit[0]
+            
+            height_fit = np.polyfit(times,lons,1)
+            height_vel = height_fit[0]
+            
+            
+            lat_disp = (lat_vel - ref_lat_vel) * time_window
+            lon_disp = (lon_vel - ref_lon_vel) * time_window
+            height_disp = (height_vel - ref_height_vel) * time_window
+            
+            disps[station] = [lon_disp,lat_disp,height_disp,start_lon,start_lat]
+            
+    return disps
+            
+def plot_displacement_vectors_degrandpre(fig,disps,scaling_factor=10):
+    e_disp = []
+    n_disp = []
+    lats = []
+    lons = []
+    for key in disps:
+        vals = disps[key]
+        e_disp.append(vals[0])
+        n_disp.append(vals[1])
+        lats.append(vals[4])
+        lons.append(vals[3])
+        
+    
+    angle_list = []
+    length_list = []
+    for i in range(len(e_disp)):
+        angle_list.append(np.rad2deg(np.arctan(n_disp[i]/e_disp[i])))
+        length_list.append((e_disp[i]**2 + n_disp[i]**2)**0.5)
+        
+    length_list = [val*scaling_factor for val in length_list]
+
+    fig.plot(x=lons,
+             y=lats,
+             style="v0.35c+e",
+             direction=[angle_list, length_list],
+             pen="0.5p",
+             color="red3")
+    
+    return fig
+    
 def make_gps_station_displacement_df(filelist):
     """
     Makes a DataFrame containing GPS initial positions and their total 
@@ -294,7 +391,6 @@ def make_gps_relative_displacement_df_dict(filelist,ref_station,
                 ref_height_at_time = ref_height_poly(time)
                 if i == 0:
                     
-                    
                     # Fix lon and calculate lat diff
                     initial_lat_diff = distance.distance([ref_lat_at_time,ref_lon_at_time],
                                                          [stat_lat[i],ref_lon_at_time]).km
@@ -322,7 +418,7 @@ def make_gps_relative_displacement_df_dict(filelist,ref_station,
                     
             lon_disp = [x * -100000 for x in lon_disp]
             lat_disp = [x * -100000 for x in lat_disp]
-            height_disp = [x * -1000 for x in height_disp]
+            height_disp = [x * -100 for x in height_disp]
         
             if plot_lons:
                 plt.plot(stat_times,lon_disp)
@@ -344,7 +440,7 @@ def make_gps_relative_displacement_df_dict(filelist,ref_station,
                 plt.plot(stat_times,height_disp)
                 plt.plot(stat_times,height_disp,'o')
                 plt.title(f'Vertical Displacement at {stat_name} Relative to {ref_station}')
-                plt.ylabel('Vertical Change (mm)')
+                plt.ylabel('Vertical Change (cm)')
                 plt.xlabel('Time')
                 plt.show()
                 
@@ -374,10 +470,9 @@ def velocity_fits_from_dict(gps_disp_dict,max_degree_to_test=4):
         vels = [E_Vel,N_Vel,H_Vel]
         vel_dict[station] = vels
         
-    
     return vel_dict
 
-def plot_gps_velocity_vectors(fig,stat_df,vel_dict,scaling_factor=1000):
+def plot_gps_velocity_vectors(fig,stat_df,vel_dict,scaling_factor=10):
     """
     Parameters
     ----------
@@ -398,14 +493,28 @@ def plot_gps_velocity_vectors(fig,stat_df,vel_dict,scaling_factor=1000):
     """
     lats = stat_df['Latitude'].tolist()
     lons = stat_df['Longitude'].tolist()
-    e_disp = stat_df['E_Disp'].tolist()
-    n_disp = stat_df['N_Disp'].tolist()
+    stats = stat_df['Station'].tolist()
+    
+    for i, stat in enumerate(stats):
+        if stat == 'AKMO':
+            del lats[i]
+            del lons[i]
+    
+    e_vel = []
+    n_vel = []
+    for stat in stats:
+        if stat == 'AKMO':
+            pass
+        else:
+            e_vel.append(vel_dict[stat][0])
+            n_vel.append(vel_dict[stat][1])
+        
     
     angle_list = []
     length_list = []
-    for i in range(len(e_disp)):
-        angle_list.append(np.rad2deg(np.arctan(n_disp[i]/e_disp[i])))
-        length_list.append((e_disp[i]**2 + n_disp[i]**2)**0.5)
+    for i in range(len(e_vel)):
+        angle_list.append(np.rad2deg(np.arctan(n_vel[i]/e_vel[i])))
+        length_list.append((e_vel[i]**2 + n_vel[i]**2)**0.5)
         
     length_list = [val*scaling_factor for val in length_list]
         
@@ -447,47 +556,3 @@ def plot_gps_stations(fig,stat_df,fill='black'):
              fill=fill)
     
     return fig
-
-def plot_gps_displacement_vectors(fig,stat_df,scaling_factor=1000):
-    """
-    Parameters
-    ----------
-    fig : pygmt.Figure
-        PyGMT figure, see scripts.general_mapping.plot_base_map for a
-        convenient base figure to start with.
-    stat_df : pandas.DataFrame
-        Pandas DataFrame with columns 'Latitude','Longitude','E_Disp', 'N_Disp'.
-        All other columns don't matter.
-    scaling_factor : int or float, optional
-        Multiplier of the vector length. The default is 1000.
-
-    Returns
-    -------
-    fig : pygmt.Figure
-        Input figure with velocity vectors drawn on top.
-
-    """
-    lats = stat_df['Latitude'].tolist()
-    lons = stat_df['Longitude'].tolist()
-    e_disp = stat_df['E_Disp'].tolist()
-    n_disp = stat_df['N_Disp'].tolist()
-    
-    angle_list = []
-    length_list = []
-    for i in range(len(e_disp)):
-        angle_list.append(np.rad2deg(np.arctan(n_disp[i]/e_disp[i])))
-        length_list.append((e_disp[i]**2 + n_disp[i]**2)**0.5)
-        
-    length_list = [val*scaling_factor for val in length_list]
-        
-
-    fig.plot(x=lons,
-             y=lats,
-             style="v0.6c+e",
-             direction=[angle_list, length_list],
-             pen="2p",
-             color="red3")
-            
-    return fig
-
-    

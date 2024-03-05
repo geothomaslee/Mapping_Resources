@@ -19,23 +19,26 @@ projection = 'J-65/12c'
 filelist = glob('C:/Users/tlee4/Documents/Grad School/Spring 2024/PHYS581/Alaska_Project/Xue_Data/gps/Akutan_Stations/*')
 station_df = mg.make_gps_station_df(filelist)
 
+
+disps = mg.make_gps_station_displacement_df_degrandpre(filelist,starttime=2009,endtime=2013.5)
+
+
 cmap = cu.create_combined_color_map('usgs','colombia',max_elev=2000,max_depth=-1000)
 akutan_island_fig = gm.plot_base_map(akutan_island_bounds,projection=projection,
                                      resolution='03s',cmap=cmap,figure_name='Akutan Island',
                                      bathymetry=True, colorbar_tick=500)
 
-
-
-df_dict = mg.make_gps_relative_displacement_df_dict (filelist,'AKMO')
-vel_dict = mg.velocity_fits_from_dict(df_dict)
-
-#akutan_island_fig = mg.plot_gps_displacement_vectors(akutan_island_fig,stat_df,
-#                                                     scaling_factor=1000000)
-
-#akutan_island_fig = mg.plot_gps_stations(akutan_island_fig,station_df)
+akutan_island_fig = mg.plot_displacement_vectors_degrandpre(akutan_island_fig,
+                                                            disps,scaling_factor=10000000)
 
 akutan_island_fig.show()
 
+
+
+
+#akutan_island_fig = mg.plot_gps_velocity_vectors(akutan_island_fig,station_df,
+                                                 #vel_dict)
+                                                 
 """
 #------------------------------------
 

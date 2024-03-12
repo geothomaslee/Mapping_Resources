@@ -10,9 +10,11 @@ import obspy
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.transforms as mtrans
 from obspy import UTCDateTime
 from datetime import datetime, timezone
-from matplotlib.patches import Rectangle
+from matplotlib.patches import Rectangle, PathPatch
+from matplotlib.text import TextPath
 
 
 def get_station_df(inventory):
@@ -272,7 +274,25 @@ def station_availability_from_df(df,startdate,enddate=None):
     return df_station_count
 
 
-def plot_station_availability(station_avail_df):
+def plot_station_availability(station_avail_df,interval_width=75,textsize=None,
+                              highlighted_intervals=None,interval_color='gray',interval_alpha=0.2,
+                              label_offset=0.03,label_network=None,bracket_vert_offset=0.32):
+    
+    if highlighted_intervals:
+        if type(highlighted_intervals) != list:
+            raise TypeError('Highlighted_intervals must be a list of lists (1)')
+        for interval in highlighted_intervals:
+            if type(interval) != list:
+                raise TypeError('Highlighted_intervals must be a list of lists')
+            if len(interval) != 2:
+                raise ValueError('Lists in highlighted_intervals must have length 2 and be date ranges')
+            if interval[1] < interval[0]:
+                raise ValueError('x2 must be > x1 for intervals')
+            
+    
+    if textsize == None:
+        textsize = interval_width / 4
+    
     years = station_avail_df['Year'].tolist()
     months = station_avail_df['Month'].tolist()
     
@@ -296,13 +316,12 @@ def plot_station_availability(station_avail_df):
     for index in sort_index:
         sorted_networks.append(networks[index])
         
-        
     networks = sorted_networks
     date_range = times[-1] - times[0]
         
-    fig, ax = plt.subplots(1)
+    fig, ax = plt.subplots(figsize=(20,10))
+    all_interval_dict = {}
     for j,network in enumerate(networks):
-        print(f'WORKING ON {network}')
         avail_counts = station_avail_df[network].tolist()
         interval_dict = {}
         prev_val = 0
@@ -329,12 +348,15 @@ def plot_station_availability(station_avail_df):
             prev_val = avail
             
         interval_dict[list(interval_dict.keys())[-1]].append(times[-1])
+        
+        all_interval_dict[network] = interval_dict # Storing the interval dict for each network in a dict
                     
 
-        anchor_level = 100 * j
+        anchor_level = interval_width * j + 10
         dash_x = [times[0],times[-1]]
         dash_y = [anchor_level,anchor_level]
-        ax.plot(dash_x,dash_y,'b--')
+        ax.plot(dash_x,dash_y,linestyle='--',linewidth=0.25,color='Black')
+        
         for interval in interval_dict:
             interval_info = interval_dict[interval]
             startdate = interval_dict[interval][0]
@@ -345,17 +367,67 @@ def plot_station_availability(station_avail_df):
             xy = [startdate,y_anchor]
             width = enddate-startdate
             height = count
-            rect = Rectangle(xy,width,count,facecolor='Black')
+            rect = Rectangle(xy,width,count,facecolor='Black',zorder=2)
             
             ax.add_patch(rect)
             
-        ax.set_ylim(0,100*len(networks))    
-        ax.set_xlim(times[0],times[-1])
-        ax.set_title('Station Availability Over Time')
-        ax.get_yaxis().set_visible(False)
+        ax.text(times[0] - date_range*label_offset, anchor_level, network,fontsize=textsize)
         
-        ax.text(times[0] - date_range*0.04, anchor_level, network)
+    if label_network == None:
+        # Figuring out which network has the least variation over time, will be
+        # used later to add a scale bar to that station
+        vary_dict = {}
+        for network in networks:
+            counts = station_avail_df[network].tolist()
+            counts = [i for i in counts if i != 0]
+            mean = np.mean(counts)
+            max_count = max(counts)
+            min_count = min(counts)
+            
+            vary_score = np.mean([abs(mean-max_count),abs(mean-min_count)])
+            vary_dict[network] = vary_score
+            
+        # Finding the minimum variation, then selecting stations with similarly 
+        # low variations
+        min_vary = min(vary_dict.values())
+        networks_low_vary = [k for k,v in vary_dict.items() if float(v) <= 2*min_vary]
         
+        best_network = networks_low_vary[0]
+        best_network_val = max(station_avail_df[best_network].tolist())
+        for network in networks_low_vary:
+            if max(station_avail_df[network].tolist()) > best_network_val:
+                best_network = network
+                best_network_val = max(station_avail_df[network].tolist())
+                
+        label_network = best_network
+            
+    scale_anchor_level = (networks.index(label_network) * interval_width) + 10
+    
+    counts = station_avail_df[label_network].tolist()
+    x = all_interval_dict[label_network][list(interval_dict.keys())[0]][0] - 0.05*date_range
+    y = scale_anchor_level - bracket_vert_offset*max(counts)
+    scale = max(counts)
+    
+    tp = TextPath((0, 0), "{", size=1)
+    trans = mtrans.Affine2D().scale(1, scale) + \
+    mtrans.Affine2D().translate(x,y) + ax.transData
+    pp = PathPatch(tp, lw=0, fc="k", transform=trans)
+    ax.add_artist(pp)
+    
+    for interval in highlighted_intervals:
+        ax.axvspan(interval[0],interval[1],color=interval_color,alpha=interval_alpha)
+    
+
+    ax.text(x - (3*label_offset*date_range),scale_anchor_level-(0.25*bracket_vert_offset*max(counts)),f'{max(station_avail_df[label_network].tolist())} stations',
+            fontsize=textsize)
+        
+    ax.set_title('Station Availability Over Time',fontsize=textsize)
+    
+    ax.set_ylim(0,interval_width*len(networks))  
+    ax.get_yaxis().set_visible(False)
+    
+    ax.set_xlim(times[0],times[-1])       
+    ax.tick_params(axis='x',labelsize=textsize)
     fig.show()
         
         

@@ -268,6 +268,50 @@ def station_availability_from_df(df,startdate,enddate=None):
     plt.show()
         
     return df_station_count
+
+
+def plot_station_availability(station_avail_df):
+    years = station_avail_df['Year'].tolist()
+    months = station_avail_df['Month'].tolist()
+    
+    times = []
+    for i, year in enumerate(years):
+        month = months[i]
+        decimal_year = year + (month/12)
+        times.append(decimal_year)
+        
+    avail_counts = station_avail_df['UW'].tolist()
+    interval_dict = {}
+    prev_val = 0
+    first_row = True
+    for i,time in enumerate(times):
+        avail = avail_counts[i]
+        
+
+        if first_row:
+            if avail != 0: # Don't create the first row if it's 0
+                int_num = len(interval_dict) + 1
+                interval_dict[f'int{int_num}'] = [time,avail]
+                first_row = False
+        else: # If we haven't already created the first row
+            if avail == prev_val:
+                pass # Skip if the count doesn't change
+            else:
+                int_num = len(interval_dict)
+                interval_dict[f'int{int_num}'].append(time) # Adds current time as end of previous step
+                
+                int_num = len(interval_dict) + 1
+                interval_dict[f'int{int_num}'] = [time,avail]
+                
+        prev_val = avail
+                
+    print(interval_dict)
+                
+                
+                
+        
+        
+    
                 
     
                 

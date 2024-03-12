@@ -27,6 +27,9 @@ station_df.to_csv('Stations_To_Correlate.csv')
 station_avail_df = su.station_availability_from_df(station_df,startdate='2000-01-01')
 station_avail_df.to_csv('Station_Availability_Over_Time.csv')
 
+su.plot_station_availability(station_avail_df)
+
+"""
 # Creating a nice colormap
 cmap = cu.create_combined_color_map('usgs','colombia',max_elev=4500,max_depth=-1500)
 
@@ -67,3 +70,4 @@ local_fig = ms.plot_stations(station_inv,region=box_bounds,
                         
 local_fig.show()
 gm.save_fig(local_fig,"Local_View_Stations")
+"""

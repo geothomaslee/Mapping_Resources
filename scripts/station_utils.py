@@ -6,11 +6,13 @@ Created on Thu Jan 25 10:02:18 2024
 @author: thomaslee
 """
 
-import pandas as pd
 import obspy
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 from obspy import UTCDateTime
 from datetime import datetime, timezone
-import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
 
 
 def get_station_df(inventory):
@@ -280,32 +282,83 @@ def plot_station_availability(station_avail_df):
         decimal_year = year + (month/12)
         times.append(decimal_year)
         
-    avail_counts = station_avail_df['UW'].tolist()
-    interval_dict = {}
-    prev_val = 0
-    first_row = True
-    for i,time in enumerate(times):
-        avail = avail_counts[i]
+    networks = station_avail_df.columns.values.tolist()[2:-1]
+    
+    # Sorting the networks by their max station count
+    max_counts = []
+    for network in networks:
+        max_counts.append(max(station_avail_df[network].tolist()))
+    
+    sorted_max_counts = np.array(max_counts)
+    sort_index = np.argsort(max_counts)
+    
+    sorted_networks = []
+    for index in sort_index:
+        sorted_networks.append(networks[index])
         
+        
+    networks = sorted_networks
+    date_range = times[-1] - times[0]
+        
+    fig, ax = plt.subplots(1)
+    for j,network in enumerate(networks):
+        print(f'WORKING ON {network}')
+        avail_counts = station_avail_df[network].tolist()
+        interval_dict = {}
+        prev_val = 0
+        first_row = True
+        for i,time in enumerate(times):
+            avail = avail_counts[i]
+            
+    
+            if first_row:
+                if avail != 0: # Don't create the first row if it's 0
+                    int_num = len(interval_dict) + 1
+                    interval_dict[f'int{int_num}'] = [time,avail]
+                    first_row = False
+            else: # If we haven't already created the first row
+                if avail == prev_val:
+                    pass # Skip if the count doesn't change
+                else:
+                    int_num = len(interval_dict)
+                    interval_dict[f'int{int_num}'].append(time) # Adds current time as end of previous step
+                    
+                    int_num = len(interval_dict) + 1
+                    interval_dict[f'int{int_num}'] = [time,avail]
+                    
+            prev_val = avail
+            
+        interval_dict[list(interval_dict.keys())[-1]].append(times[-1])
+                    
 
-        if first_row:
-            if avail != 0: # Don't create the first row if it's 0
-                int_num = len(interval_dict) + 1
-                interval_dict[f'int{int_num}'] = [time,avail]
-                first_row = False
-        else: # If we haven't already created the first row
-            if avail == prev_val:
-                pass # Skip if the count doesn't change
-            else:
-                int_num = len(interval_dict)
-                interval_dict[f'int{int_num}'].append(time) # Adds current time as end of previous step
-                
-                int_num = len(interval_dict) + 1
-                interval_dict[f'int{int_num}'] = [time,avail]
-                
-        prev_val = avail
-                
-    print(interval_dict)
+        anchor_level = 100 * j
+        dash_x = [times[0],times[-1]]
+        dash_y = [anchor_level,anchor_level]
+        ax.plot(dash_x,dash_y,'b--')
+        for interval in interval_dict:
+            interval_info = interval_dict[interval]
+            startdate = interval_dict[interval][0]
+            count = interval_dict[interval][1]
+            enddate = interval_dict[interval][2]
+            
+            y_anchor = anchor_level - (0.5*count)
+            xy = [startdate,y_anchor]
+            width = enddate-startdate
+            height = count
+            rect = Rectangle(xy,width,count,facecolor='Black')
+            
+            ax.add_patch(rect)
+            
+        ax.set_ylim(0,100*len(networks))    
+        ax.set_xlim(times[0],times[-1])
+        ax.set_title('Station Availability Over Time')
+        ax.get_yaxis().set_visible(False)
+        
+        ax.text(times[0] - date_range*0.04, anchor_level, network)
+        
+    fig.show()
+        
+        
                 
                 
                 

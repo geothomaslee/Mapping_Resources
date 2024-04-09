@@ -227,6 +227,22 @@ def plot_base_map(region,projection="Q15c+du",figure_name="figure!",
                   borders="a/1.2p,black",
                   water=watercolor,
                   resolution="f")
+        
+    if box_bounds != None:
+        if len(bounds) != 4:
+            raise ValueError(f'Expected 4 items in box_bounds, got {len(box_bounds)}')
+            
+        bminlon = box_bounds[0]
+        bmaxlon = box_bounds[1]
+        bminlat = box_bounds[2]
+        bmaxlat = box_bounds[3]
+        
+        blats = [bminlat, bmaxlat, bmaxlat, bminlat, bminlat]
+        blons = [bminlon, bminlon, bmaxlon, bmaxlon, bminlon]
+        
+        fig.plot(x=blons,
+                 y=blats,
+                 pen="1p")   
     
     return fig
 

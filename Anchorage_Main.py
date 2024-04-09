@@ -13,23 +13,40 @@ import scripts.colormap_utils as cu
 
 
 deployment_list = [['NP','2002-01-01','2024-01-01']]
-region_bounds = [-152.3,-147.7,60.3,62.1]
-projection = 'J-65/12c'
+region_bounds = [-150.4,-148,60.6,61.9]
 
 station_inv = ms.find_multi_network(deployment_list,region_bounds)
 
-# Creating a nice colormap
-cmap = cu.create_combined_color_map('usgs','colombia',max_elev=1000,max_depth=-1500)
-
-# Plotting a regional overview
-anchorage_region_fig = ms.plot_stations(station_inv,
+# Plotting a local overview
+cmap = cu.create_combined_color_map('usgs','colombia',max_elev=4500,max_depth=-1000)
+local_projection = 'J-65/12c'
+anchorage_local_fig = ms.plot_stations(station_inv,
                                         figure_name="Anchorage Strong-Motion Network",
                                         box_bounds=region_bounds,
-                                        resolution="06s",
+                                        region=region_bounds,
+                                        resolution="15s",
                                         cmap=cmap,
                                         margin=0.1,
                                         bathymetry=True,
-                                        projection=projection)
+                                        projection=local_projection)
 
-anchorage_region_fig.show()
+anchorage_local_fig.show()
+
+# Plotting a regional overview
+cmap = cu.create_combined_color_map('usgs','colombia',max_elev=4000,max_depth=-6000)
+regional_projection = 'J-65/12c'
+anchorage_regional_fig = gm.plot_base_map(region=region_bounds,
+                                          projection=regional_projection,
+                                          figure_name='Study Area Within Alaska, USA',
+                                          box_bounds=region_bounds,
+                                          margin=5,
+                                          cmap=cmap,
+                                          resolution='03m',
+                                          bathymetry=True)
+
+anchorage_regional_fig = gm.plot_major_cities(anchorage_regional_fig,minpopulation=20000,
+                                              offset=0.09)
+
+
+anchorage_regional_fig.show()
                                      

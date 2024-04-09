@@ -273,7 +273,7 @@ def plot_stations(inventory,fig=None,projection="Q15c+du",figure_name="figure!",
                      projection=projection,
                      frame=["a",f'+t{figure_name}'],
                      cmap=cmap)
-        fig.colorbar(frame=[f"a{colorbar_tick}", "x+lElevation", "y+lm"])
+        fig.colorbar(frame=[f"a{colorbar_tick}", "x+lElevation (m)", "y+lm"])
         fig.coast(shorelines="4/0.5p,black",
                   projection=projection,
                   borders="2/1.2p,black")

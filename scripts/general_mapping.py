@@ -109,10 +109,12 @@ def get_margin_from_bounds(bounds,margin=0.1):
     max_lon = max(lons) + (margin * abs(max(lons) - min(lons)))
     max_lat = max(lats) + (margin * abs(max(lats) - min(lats)))
     
-    min_lon = check_lon(min_lon)
-    min_lat = check_lat(min_lat)
-    max_lon = check_lon(max_lon)
-    max_lat = check_lat(max_lat)
+    if min_lon > max_lon:
+        new_max_lon = min_lon
+        new_min_lon = max_lon
+        
+        min_lon = new_min_lon
+        max_lon = new_max_lon
     
     marginal_bounds = [min_lon, max_lon, min_lat, max_lat]
     

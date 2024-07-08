@@ -7,9 +7,6 @@ Created on Tue Nov  7 15:05:26 2023
 
 from obspy.clients.fdsn import Client
 import pygmt
-import numpy as np
-from tqdm import tqdm
-import pandas as pd
 
 if __name__ == '__main__':
     import general_mapping as gm
@@ -41,7 +38,7 @@ def find_stations(network, starttime,endtime,station='*',client="IRIS"):
     working_client = Client(client)
     station_inv = working_client.get_stations(starttime=starttime,
                                               endtime=endtime,
-                                              network=network, 
+                                              network=network,
                                               station=station,
                                               level="channel",)
     return station_inv
@@ -58,48 +55,52 @@ def find_multi_network(deployment_list,bounds,client="IRIS"):
         Region to search for stations, in order [minlon, maxlon, minlat, maxlat]
     client : string, optional
         Data host. If unsure use default. The default is "IRIS".
-        
+
     Returns
     -------
     station_inv : obspy.core.inventory.Inventory
         ObsPy inventory object containing the stations.
     """
-    
+    print('======BUILDING INVENTORY======')
+
     if len(bounds) != 4:
         raise ValueError(f'Expected 4 items in bounds, got {len(bounds)}')
-        
+
     minlon = bounds[0]
     maxlon = bounds[1]
     minlat = bounds[2]
     maxlat = bounds[3]
-    
+
+    print('Requesting inventories...')
     working_client = Client(client)
     for i, deployment in enumerate(deployment_list):
         network = deployment[0]
         starttime = deployment[1]
         endtime = deployment[2]
-        
+
         if len(deployment) == 3:
             stations = "*"
         elif len(deployment) == 4:
             stations = deployment[3]
         else:
             raise ValueError("Expected 3 or 4 arguments for network {network}, got {len(deployment})")
-        
+
+
         if i < 1:
             station_inv = working_client.get_stations(starttime=starttime,
                                                       endtime=endtime,
-                                                      network=network, 
+                                                      network=network,
                                                       station=stations,
                                                       level="channel",
                                                       minlatitude=minlat,
                                                       maxlatitude=maxlat,
                                                       minlongitude=minlon,
                                                       maxlongitude=maxlon)
+            print('Obtained inventory for deployment 1')
         else:
             secondary_inv = working_client.get_stations(starttime=starttime,
                                                         endtime=endtime,
-                                                        network=network, 
+                                                        network=network,
                                                         station=stations,
                                                         level="channel",
                                                         minlatitude=minlat,
@@ -107,14 +108,21 @@ def find_multi_network(deployment_list,bounds,client="IRIS"):
                                                         minlongitude=minlon,
                                                         maxlongitude=maxlon)
             station_inv += secondary_inv
-            
-    station_total = 0
-    for network in station_inv:
-        station_total += len(network)
-        
-    print(f'{station_total} stations found in {len(station_inv)} networks!')
-            
+            print(f'Obtained inventory for deployment {i+1}')
+
+    station_total = getStationCount(station_inv)
+
+    print(f'{station_total} stations found in {len(station_inv)} networks.')
+    print('=====INVENTORY OBTAINED=======')
+
     return station_inv
+
+def getStationCount(inventory):
+    """Returns total number of stations in inventory, across all networks"""
+    count = 0
+    for network in inventory:
+        count += len(network)
+    return count
 
 def get_coordinates_from_network(network):
     """
@@ -136,14 +144,14 @@ def get_coordinates_from_network(network):
     lat_list = []
     lon_list = []
     elev_list = []
-    
+
     for station in network:
         lat_list.append(station.latitude)
         lon_list.append(station.longitude)
         elev_list.append(station.elevation)
-        
+
     return lat_list, lon_list, elev_list
-    
+
 def get_coordinate_list(inventory):
     """
     Parameters
@@ -161,17 +169,17 @@ def get_coordinate_list(inventory):
         List of elevations.
 
     """
-    
+
     lat_list = []
     lon_list = []
     elev_list = []
-    
+
     for network in inventory:
         lats, lons, elevs = get_coordinates_from_network(network)
         lat_list += lats
         lon_list += lons
         elev_list += elevs
-    
+
     return lat_list, lon_list, elev_list
 
 def plot_bounding_box(fig, bounds):
@@ -188,24 +196,24 @@ def plot_bounding_box(fig, bounds):
     fig : pygmt.Figure
         Input figure with box added.
     """
-    
+
     if len(bounds) != 4:
         raise ValueError(f'Expected 4 items in bounds, got {len(bounds)}')
-        
+
     minlon = bounds[0]
     maxlon = bounds[1]
     minlat = bounds[2]
     maxlat = bounds[3]
-    
+
     lats = [minlat, maxlat, maxlat, minlat, minlat]
     lons = [minlon, minlon, maxlon, maxlon, minlon]
-    
+
     fig.plot(x=lons,
              y=lats,
              pen="1p")
-    
+
     return fig
-    
+
 
 def plot_stations(inventory,fig=None,projection="Q15c+du",figure_name="figure!",
                   resolution='03s',region=None,
@@ -236,7 +244,7 @@ def plot_stations(inventory,fig=None,projection="Q15c+du",figure_name="figure!",
         Region to draw a box around, in order [minlon, maxlon, minlat, maxlat].
         If none is set, no box will be drawn
     margin : int or float, optional
-        Margin size, multiplied by the length of the bounds. 0.1 = 10% margin. 
+        Margin size, multiplied by the length of the bounds. 0.1 = 10% margin.
         The default is 0.1.
     outside_stats_small : bool, optional
         If True and a bounding box has been specified, then will make stations
@@ -250,44 +258,56 @@ def plot_stations(inventory,fig=None,projection="Q15c+du",figure_name="figure!",
         PyGMT figure with plotted data.
 
     """
-        
+
     if outside_stats_small == True:
         if box_bounds == None:
             return ValueError('No box bounds specified for outside_stats_small')
-    
+
+    print('======CREATING STATION PLOT======')
+    print('Pulling station coordinates from inventory...')
     lats,lons,elevs = get_coordinate_list(inventory)
-    
+
+    print('Calculating map bounds with margin...')
     if region == None:
         bounds = gm.get_margin_from_lat_lon(lats,lons,margin=margin)
     else:
         bounds = gm.get_margin_from_bounds(region,margin=margin)
-        
+
     if fig == None:
-        grid = pygmt.datasets.load_earth_relief(resolution=resolution, region=bounds)
-        
-        fig = pygmt.Figure()
-        fig.basemap(region=bounds,
-                    projection=projection,
-                    frame=True)
-        fig.grdimage(grid=grid,
-                     projection=projection,
-                     frame=["a",f'+t{figure_name}'],
-                     cmap=cmap)
-        fig.colorbar(frame=[f"a{colorbar_tick}", "x+lElevation (m)", "y+lm"])
-        fig.coast(shorelines="4/0.5p,black",
-                  projection=projection,
-                  borders="2/1.2p,black")
-        if not bathymetry:
+        try:
+            print('Loading relief grid...')
+            grid = pygmt.datasets.load_earth_relief(resolution=resolution, region=bounds)
+
+            print('Creating base map...')
+            fig = pygmt.Figure()
+            fig.basemap(region=bounds,
+                        projection=projection,
+                        frame=True)
+            fig.grdimage(grid=grid,
+                         projection=projection,
+                         frame=["a",f'+t{figure_name}'],
+                         cmap=cmap)
+            fig.colorbar(frame=[f"a{colorbar_tick}", "x+lElevation (m)", "y+lm"])
             fig.coast(shorelines="4/0.5p,black",
                       projection=projection,
-                      borders="2/1.2p,black",
-                      water="skyblue",
-                      resolution="f")
-    
-    
-    colors = ["cyan","yellow","green","blue","purple","orange","red"]
-    
+                      borders="2/1.2p,black")
+            if not bathymetry:
+                fig.coast(shorelines="4/0.5p,black",
+                          projection=projection,
+                          borders="2/1.2p,black",
+                          water="skyblue",
+                          resolution="f")
+        except Exception as e:
+            print(f'RECEIVED FOLLOWING ERROR WITH BOUNDS {bounds}')
+            raise(e)
+    else:
+        print('Using input figure as basemap...')
 
+
+
+    colors = ["cyan","yellow","green","blue","purple","orange","red"]
+
+    print('Plotting stations...')
     for i, network in enumerate(inventory):
         lats,lons,elevs = get_coordinates_from_network(network)
         fig.plot(x=lons,
@@ -296,27 +316,26 @@ def plot_stations(inventory,fig=None,projection="Q15c+du",figure_name="figure!",
                  fill=colors[i],
                  label=network.code,
                  pen="0.2p")
-        
+
     if box_bounds != None:
         if len(bounds) != 4:
             raise ValueError(f'Expected 4 items in box_bounds, got {len(box_bounds)}')
-            
+
         bminlon = box_bounds[0]
         bmaxlon = box_bounds[1]
         bminlat = box_bounds[2]
         bmaxlat = box_bounds[3]
-        
+
         blats = [bminlat, bmaxlat, bmaxlat, bminlat, bminlat]
         blons = [bminlon, bminlon, bmaxlon, bmaxlon, bminlon]
-        
+
         fig.plot(x=blons,
                  y=blats,
-                 pen="1p")   
-    
+                 pen="1p")
+
     if plot_holo_vol == True:
         fig = gm.plot_holocene_volcanoes(fig)
-            
+
     fig.legend()
-    
+
     return fig
-    

@@ -23,27 +23,26 @@ if len(filelist) == 0:
     raise ValueError('No files found')
 station_df = mg.make_gps_station_df(filelist)
 
-"""
-disps = mg.make_gps_station_displacement_df_degrandpre(filelist,starttime=2009,endtime=2013.5)
-
 
 cmap = cu.create_combined_color_map('usgs','colombia',max_elev=2000,max_depth=-1000)
-akutan_island_fig = gm.plot_base_map(akutan_island_bounds,projection=projection,
-                                     resolution='03s',cmap=cmap,figure_name='Akutan Island',
-                                     bathymetry=True, colorbar_tick=500)
+akutan_island_fig = gm.plot_base_map(akutan_island_bounds,
+                                     projection=projection,
+                                     resolution='01s',
+                                     cmap=cmap,
+                                     figure_name='Akutan Island GPS Stations',
+                                     bathymetry=False, 
+                                     colorbar_tick=500)
 
-akutan_island_fig = mg.plot_displacement_vectors_degrandpre(akutan_island_fig,
-                                                            disps,scaling_factor=10000000)
+akutan_island_fig = mg.plot_gps_stations(akutan_island_fig,
+                                         station_df)
 
 akutan_island_fig.show()
 
+gm.save_fig(akutan_island_fig,
+            name='Akutan_Island_GPS_Stations')
 
-
-
-#akutan_island_fig = mg.plot_gps_velocity_vectors(akutan_island_fig,station_df,
-                                                 #vel_dict)
                                                  
-"""
+
 #------------------------------------
 cmap = cu.create_combined_color_map('usgs','colombia',max_elev=6000,max_depth=-8000)
 aleutian_region_fig = gm.plot_base_map(region=akutan_region,
@@ -60,13 +59,18 @@ aleutian_region_fig = gm.plot_holocene_volcanoes(aleutian_region_fig)
 
 aleutian_region_fig.show()
 
+gm.save_fig(aleutian_region_fig,
+            name='Aleutian_Region_Fig')
+
 
 #------------------------------------
 
 cmap = cu.create_combined_color_map('usgs','colombia',max_elev=1500,max_depth=-7000)
-akutan_regional_fig = gm.plot_base_map(akutan_region,projection=projection,
+akutan_regional_fig = gm.plot_base_map(akutan_region,
+                                       projection=projection,
                                        figure_name='Akutan Region',
-                                       cmap=cmap, bathymetry=True)
+                                       cmap=cmap, 
+                                       bathymetry=True)
 
 akutan_regional_fig = gm.plot_holocene_volcanoes(akutan_regional_fig)
 
@@ -74,6 +78,9 @@ akutan_regional_fig = gm.plot_label(akutan_regional_fig,54.136,-165.96,
                                     label='Akutan Volcano',offset=0.05)
 
 akutan_regional_fig.show()
+
+gm.save_fig(akutan_regional_fig,
+            name='Akutan_Island_Region')
 
 #-------------------------------------
 """

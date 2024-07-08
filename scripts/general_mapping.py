@@ -222,7 +222,7 @@ def plot_base_map(region,projection="Q15c+du",figure_name="figure!",
                  frame=["a",f'+t{figure_name}'],
                  cmap=cmap)
     if bathymetry:
-        fig.colorbar(frame=[f"a{colorbar_tick}", "x+lElevation", "y+lm"])
+        fig.colorbar(frame=[f"a{colorbar_tick}", "x+lElevation (m)", "y+lm"])
     if not bathymetry:
         fig.coast(shorelines="4/0.5p,black",
                   projection=projection,

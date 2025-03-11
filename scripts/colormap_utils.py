@@ -340,6 +340,10 @@ def create_combined_color_map(topo_cmap,bathy_cmap,max_elev,max_depth,cmap_dir=N
     topo_cmap_df = remap_cmap(topo_cmap_df,0,max_elev)
     topo_cmap_df = interpolate_cmap(topo_cmap_df,20)
 
+    if max_depth == 0:
+        save_cmap_df_as_cpt(topo_cmap_df,save_path)
+        return save_path
+
     bathy_cmap_df = clean_colormap_df(bathy_cmap)
     bathy_cmap_df = isolate_bathymetry(bathy_cmap_df)
     bathy_cmap_df = remap_cmap(bathy_cmap_df,max_depth,0)

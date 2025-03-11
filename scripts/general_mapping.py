@@ -75,14 +75,14 @@ def get_margin_from_lat_lon(lats,lons,margin=0.1):
     min_lat = min(lats) - (margin * abs(max(lats) - min(lats)))
     max_lon = max(lons) + (margin * abs(max(lons) - min(lons)))
     max_lat = max(lats) + (margin * abs(max(lats) - min(lats)))
-    
+
     min_lon = check_lon(min_lon)
     min_lat = check_lat(min_lat)
     max_lon = check_lon(max_lon)
     max_lat = check_lat(max_lat)
-    
+
     bounds = [min_lon, max_lon, min_lat, max_lat]
-    
+
     return bounds
 
 def get_margin_from_bounds(bounds,margin=0.1):
@@ -92,7 +92,7 @@ def get_margin_from_bounds(bounds,margin=0.1):
     bounds : list of ints or floats
         Region to search for stations, in order [minlon, maxlon, minlat, maxlat]
     margin : int or float, optional
-        Margin size, multiplied by the length of the bounds. 0.1 = 10% margin. 
+        Margin size, multiplied by the length of the bounds. 0.1 = 10% margin.
         The default is 0.1.
 
     Returns
@@ -103,21 +103,21 @@ def get_margin_from_bounds(bounds,margin=0.1):
     """
     lons = [bounds[0],bounds[1]]
     lats = [bounds[2],bounds[3]]
-            
+
     min_lon = min(lons) - (margin * abs(max(lons) - min(lons)))
     min_lat = min(lats) - (margin * abs(max(lats) - min(lats)))
     max_lon = max(lons) + (margin * abs(max(lons) - min(lons)))
     max_lat = max(lats) + (margin * abs(max(lats) - min(lats)))
-    
+
     if min_lon > max_lon:
         new_max_lon = min_lon
         new_min_lon = max_lon
-        
+
         min_lon = new_min_lon
         max_lon = new_max_lon
-    
+
     marginal_bounds = [min_lon, max_lon, min_lat, max_lat]
-    
+
     return marginal_bounds
 
 def check_if_in_bounds(lat,lon,bounds):
@@ -144,7 +144,7 @@ def check_if_in_bounds(lat,lon,bounds):
         is_in_bounds = True
     else:
         is_in_bounds = False
-        
+
     return is_in_bounds
 
 def get_bounds_from_figure(fig):
@@ -161,14 +161,14 @@ def get_bounds_from_figure(fig):
     """
     region = fig.region
     bounds_list = region.tolist()
-    
+
     return bounds_list
 
 def find_elevation_range(grid):
     grid_np = grid.values
     max_elev = np.amax(grid_np)
     min_elev = np.amin(grid_np)
-    
+
     return min_elev, max_elev
 
 def plot_base_map(region,projection="Q15c+du",figure_name="figure!",
@@ -187,7 +187,7 @@ def plot_base_map(region,projection="Q15c+du",figure_name="figure!",
     figure_name : string, optional
         Title of figure. The default is "figure!".
     resolution : string, optional
-        Resolution of topo data. See pygmt.load_earth_relief for more. 
+        Resolution of topo data. See pygmt.load_earth_relief for more.
         The default is '03s'.
     cmap : string, optional
         Path to colormap. The default is "./Resources/colormaps/cpt-city/colombia.cpt".
@@ -205,22 +205,23 @@ def plot_base_map(region,projection="Q15c+du",figure_name="figure!",
     """
     if not watercolor:
         watercolor = "skyblue"
-        
-    if ' ' in figure_name:
-        figure_name = '"' + figure_name + '"'
-    
+
     bounds = get_margin_from_bounds(region,margin=margin)
-    
+
     grid = pygmt.datasets.load_earth_relief(resolution=resolution, region=bounds)
-    
+    shade = shade = pygmt.grdgradient(grid=grid, azimuth='0/90', normalize='t1')
+
     fig = pygmt.Figure()
     fig.basemap(region=bounds,
                 projection=projection,
                 frame=True)
     fig.grdimage(grid=grid,
+                 shading=shade,
                  projection=projection,
-                 frame=["a",f'+t{figure_name}'],
+                 frame=["a",f"+t{figure_name}"],
                  cmap=cmap)
+
+
     if bathymetry:
         fig.colorbar(frame=[f"a{colorbar_tick}", "x+lElevation (m)", "y+lm"])
     if not bathymetry:
@@ -229,23 +230,24 @@ def plot_base_map(region,projection="Q15c+du",figure_name="figure!",
                   borders="a/1.2p,black",
                   water=watercolor,
                   resolution="f")
-        
+
+
     if box_bounds != None:
         if len(bounds) != 4:
             raise ValueError(f'Expected 4 items in box_bounds, got {len(box_bounds)}')
-            
+
         bminlon = box_bounds[0]
         bmaxlon = box_bounds[1]
         bminlat = box_bounds[2]
         bmaxlat = box_bounds[3]
-        
+
         blats = [bminlat, bmaxlat, bmaxlat, bminlat, bminlat]
         blons = [bminlon, bminlon, bmaxlon, bmaxlon, bminlon]
-        
+
         fig.plot(x=blons,
                  y=blats,
-                 pen="1p")   
-    
+                 pen="1p")
+
     return fig
 
 def plot_label(fig,lat,lon,style='b0.35c',fill='black',label=None,
@@ -254,26 +256,26 @@ def plot_label(fig,lat,lon,style='b0.35c',fill='black',label=None,
     if label:
         if type(label) != str:
             raise TypeError('Label must be string')
-            
+
     bounds = get_bounds_from_figure(fig)
-    
+
     height,width,diag = get_map_dimensions(fig)
-    
+
     min_lon = bounds[0]
     max_lon = bounds[1]
     min_lat = bounds[2]
     max_lat = bounds[3]
-    
+
     standard_offset_height = height * offset
     standard_offset_width = width * offset * hor_offset_multiplier
-    
+
     if label:
-        
+
         if max_lat - lat <= standard_offset_height:
             label_y_val = lat - standard_offset_height
         else:
             label_y_val = lat + standard_offset_height
-        
+
         if abs(max_lon - lon) <= standard_offset_width:
             label_x_val = lon - standard_offset_width
             label_y_val = lat
@@ -282,14 +284,14 @@ def plot_label(fig,lat,lon,style='b0.35c',fill='black',label=None,
             label_y_val = lat
         else:
             label_x_val = lon
-            
+
         fig.text(x=label_x_val,
                  y=label_y_val,
                  text=label,
                  font=f'{fontsize}p,Helvetica-Bold,{label_color}')
-        
+
     return fig
-    
+
 
 def plot_holocene_volcanoes(fig):
     """
@@ -309,12 +311,12 @@ def plot_holocene_volcanoes(fig):
     holo_volc_df = pd.read_csv(vol_file)
     holocene_vol_lon_list = holo_volc_df['Longitude'].tolist()
     holocene_vol_lat_list = holo_volc_df['Latitude'].tolist()
-    
+
     fig.plot(x=holocene_vol_lon_list,
              y=holocene_vol_lat_list,
              style='t0.35c',
              fill='red')
-    
+
     return fig
 
 def get_map_dimensions(fig):
@@ -338,7 +340,7 @@ def get_map_dimensions(fig):
     height = abs(bounds[3] - bounds[2])
     width = abs(bounds[1] - bounds[0])
     diag = ((height ** 2) + (width **2) ** 0.5)
-    
+
     return height,width,diag
 
 def plot_major_cities(fig,bounds=None,minpopulation=100000,
@@ -358,7 +360,7 @@ def plot_major_cities(fig,bounds=None,minpopulation=100000,
     fontsize : int or float, optional
         Font size for city label. The default is 14.
     offset : float, optional
-        Offset of label from dot, as a fraction of total figure size. 
+        Offset of label from dot, as a fraction of total figure size.
         The default is 0.02.
     dot_color : string, optional
         Color of dots for cities. The default is 'black'.
@@ -380,28 +382,28 @@ def plot_major_cities(fig,bounds=None,minpopulation=100000,
     """
     if bounds == None:
         bounds = get_bounds_from_figure(fig)
-    
+
     min_lon = bounds[0]
     max_lon = bounds[1]
     min_lat = bounds[2]
     max_lat = bounds[3]
-    
+
     cities_csv = os.path.join(resource_folder,'worldcities.csv')
     cities_df = pd.read_csv(cities_csv)
-    
+
     # Pulling cities that meet criteria
     df_in_lat = cities_df[cities_df['lat'].between(min_lat,max_lat)]
     df_in_bounds = df_in_lat[df_in_lat['lng'].between(min_lon,max_lon)]
     df_meets_crit = df_in_bounds[df_in_bounds['population'] >= minpopulation]
-    
+
     city_list = []
     for index, row in df_meets_crit.iterrows():
         city = [row['lat'],row['lng'],row['city_ascii'],row['population']]
         city_list.append(city)
-        
+
     height,width,diag = get_map_dimensions(fig)
-    threshhold_distance = diag * close_threshhold 
-    
+    threshhold_distance = diag * close_threshhold
+
     num_cities = len(city_list)
     last_city_index = num_cities
     problem_pair_list = []
@@ -413,31 +415,31 @@ def plot_major_cities(fig,bounds=None,minpopulation=100000,
             lon1 = city[1]
             lat2 = city2[0]
             lon2 = city2[1]
-            
+
             distance = (((lat1-lat2) **2) + (lon1-lon2) **2) **0.5
             if distance < threshhold_distance:
                 problem_pair = [i, index]
                 problem_pair_list.append(problem_pair)
-                
-    if len(problem_pair_list) > 0: 
-        if len(problem_pair_list) <= 5:           
+
+    if len(problem_pair_list) > 0:
+        if len(problem_pair_list) <= 5:
             print('WARNING: These cities are too close:')
             for pair in problem_pair_list:
-        
+
                 prob1 = pair[0]
                 prob2 = pair[1]
-                
+
                 print(f'{city_list[prob1][2]} and {city_list[prob2][2]}')
             print('The larger of the two cities will be plotted. Decrease close_threshhold to change this behavior')
         else:
             print('Warning: more than 5 cities are too close')
             print('The largest of these cities will be plotted. Decrease close_threshhold to change this behavior')
-    
+
         to_remove_list = []
         for pair in problem_pair_list:
             prob1 = pair[0]
             prob2 = pair[1]
-        
+
             # If you're getting an error here with index out of bound, it's because
             # your close_threshhold is too high and too many cities are being
             # removed, which makes this script very confused.
@@ -445,26 +447,26 @@ def plot_major_cities(fig,bounds=None,minpopulation=100000,
                 to_remove_list.append(city_list[prob2])
             else:
                 to_remove_list.append(city_list[prob1])
-             
+
         city_list = [e for e in city_list if e not in to_remove_list]
-            
+
     standard_offset_height = height * offset
     standard_offset_width = width * offset * hor_offset_multiplier
-     
-    for city in city_list:  
+
+    for city in city_list:
         fig.plot(x=city[1],
                  y=city[0],
                  style=f'c{dotsize}',
                  fill=dot_color,
                  label=city[2])
-        
+
         # Fixes labels near the map edge from going off map
-        
+
         if max_lat - city[0] <= standard_offset_height:
             label_y_val = city[0] - standard_offset_height
         else:
             label_y_val = city[0] + standard_offset_height
-        
+
         if abs(max_lon - city[1]) <= standard_offset_width:
             label_x_val = city[1] - standard_offset_width
             label_y_val = city[0]
@@ -473,12 +475,12 @@ def plot_major_cities(fig,bounds=None,minpopulation=100000,
             label_y_val = city[0]
         else:
             label_x_val = city[1]
-            
+
         fig.text(x=label_x_val,
                  y=label_y_val,
                  text=city[2],
                  font=f'{fontsize}p,Helvetica-Bold,{label_color}')
-        
+
     return fig
 
 def save_fig(fig,name,dpi=720,ftype="png"):

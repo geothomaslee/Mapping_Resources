@@ -209,7 +209,7 @@ def plot_base_map(region,projection="Q15c+du",figure_name="figure!",
     bounds = get_margin_from_bounds(region,margin=margin)
 
     grid = pygmt.datasets.load_earth_relief(resolution=resolution, region=bounds)
-    shade = shade = pygmt.grdgradient(grid=grid, azimuth='0/90', normalize='t1')
+    shade = pygmt.grdgradient(grid=grid, azimuth='0/90', normalize='t1')
 
     fig = pygmt.Figure()
     fig.basemap(region=bounds,
@@ -506,3 +506,25 @@ def save_fig(fig,name,dpi=720,ftype="png"):
     print(fname)
     fig.savefig(fname=fname,
                 dpi=dpi)
+
+def plot_curve(fig, x, y, size: float=2, color: str='black',
+               style: str='-', **kwargs):
+    from scipy.interpolate import splprep, splev
+    try:
+        tck, u = splprep([x, y], **kwargs)
+    except TypeError as e:
+        if 'k' in str(e) and ('must hold') in str(e):
+            raise ValueError('k must be less than or equal to the number of control points')
+        else:
+            raise e
+    t_new = np.linspace(0, 1, 25)
+    x_smooth_bspline, y_smooth_bspline = splev(t_new, tck)
+    fig.plot(x=x_smooth_bspline,
+             y=y_smooth_bspline,
+             pen=f"{size}p,{color},{style}")
+    return fig
+
+def plot_text(fig, text, **kwargs):
+    fig.text(text=text, **kwargs)
+    return fig
+

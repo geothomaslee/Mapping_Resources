@@ -479,7 +479,8 @@ def plot_major_cities(fig,bounds=None,minpopulation=100000,
         fig.text(x=label_x_val,
                  y=label_y_val,
                  text=city[2],
-                 font=f'{fontsize}p,Helvetica-Bold,{label_color}')
+                 font=f'{fontsize}p,Helvetica-Bold,{label_color}',
+                 fill='white@50')
 
     return fig
 

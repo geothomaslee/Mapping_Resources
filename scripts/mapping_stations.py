@@ -219,7 +219,7 @@ def plot_stations(inventory,fig=None,projection="Q15c+du",figure_name="figure!",
                   resolution='03s',region=None,
                   cmap="./Resources/colormaps/colombia.cpt",
                   box_bounds=None,margin=0.1,
-                  plot_holo_vol=False,outside_stats_small=True,
+                  plot_holo_vol=False,outside_stats_small=False,
                   bathymetry=True,colorbar_tick=1000):
     """
     Parameters
@@ -261,11 +261,12 @@ def plot_stations(inventory,fig=None,projection="Q15c+du",figure_name="figure!",
 
     if outside_stats_small == True:
         if box_bounds == None:
-            return ValueError('No box bounds specified for outside_stats_small')
+            raise ValueError('No box bounds specified for outside_stats_small')
 
     print('======CREATING STATION PLOT======')
     print('Pulling station coordinates from inventory...')
-    lats,lons,elevs = get_coordinate_list(inventory)
+    if len(inventory) != 0:
+        lats,lons,elevs = get_coordinate_list(inventory)
 
     print('Calculating map bounds with margin...')
     if region == None:
@@ -277,6 +278,7 @@ def plot_stations(inventory,fig=None,projection="Q15c+du",figure_name="figure!",
         try:
             print('Loading relief grid...')
             grid = pygmt.datasets.load_earth_relief(resolution=resolution, region=bounds)
+            shade = pygmt.grdgradient(grid=grid, azimuth='0/90', normalize='t1')
 
             print('Creating base map...')
             fig = pygmt.Figure()
@@ -285,6 +287,7 @@ def plot_stations(inventory,fig=None,projection="Q15c+du",figure_name="figure!",
                         frame=True)
             fig.grdimage(grid=grid,
                          projection=projection,
+                         shading=shade,
                          frame=["a",f'+t{figure_name}'],
                          cmap=cmap)
             fig.colorbar(frame=[f"a{colorbar_tick}", "x+lElevation (m)", "y+lm"])
@@ -308,14 +311,15 @@ def plot_stations(inventory,fig=None,projection="Q15c+du",figure_name="figure!",
     colors = ["cyan","yellow","green","blue","purple","orange","red"]
 
     print('Plotting stations...')
-    for i, network in enumerate(inventory):
-        lats,lons,elevs = get_coordinates_from_network(network)
-        fig.plot(x=lons,
-                 y=lats,
-                 style="t0.4c",
-                 fill=colors[i],
-                 label=network.code,
-                 pen="0.2p")
+    if len(inventory) != 0:
+        for i, network in enumerate(inventory):
+            lats,lons,elevs = get_coordinates_from_network(network)
+            fig.plot(x=lons,
+                     y=lats,
+                     style="t0.4c",
+                     fill=colors[i],
+                     label=network.code,
+                     pen="0.2p")
 
     if box_bounds != None:
         if len(bounds) != 4:

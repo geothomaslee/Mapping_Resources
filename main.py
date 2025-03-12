@@ -9,6 +9,7 @@ import scripts.mapping_stations as ms
 import scripts.general_mapping as gm
 import scripts.station_utils as su
 import scripts.colormap_utils as cu
+import scripts.mapping_events as me
 
 
 deployment_list = [["UW","2015-01-01","2017-12-31"],["XU","2007-01-01","2011-12-31"],
@@ -55,81 +56,35 @@ pnw_regional_fig.show()
 gm.save_fig(pnw_regional_fig,"PNW Regional Overview")
 """
 
-seis_fig = gm.plot_base_map(region=[-122.3,-121.19,46.5,47.1],
-                            cmap=cmap,
-                            projection='M-122/47/12c',
-                            resolution='01s',
-                            margin=0.05,
-                            figure_name='Rainier Region Seismicity M>1, 1980-2025',
-                            bathymetry=True)
+seis_fig = me.plot_events(starttime='1980-01-01',
+                          endtime='2025-03-01',
+                          minlon=-122.3,
+                          maxlon=-121.19,
+                          minlat=46.5,
+                          maxlat=47.1,
+                          minmag=1,
+                          region=[-122.3,-121.19,46.5,47.1],
+                          cmap=cmap,
+                          projection='M-122/47/12c',
+                          resolution='01s',
+                          margin=0.05,
+                          figure_name='Rainier Region Seismicity M>1, 1980-2025',
+                          bathymetry=True)
 
-
-from obspy.clients.fdsn import Client
-from obspy import UTCDateTime
-cl = Client('IRIS')
-catalog = cl.get_events(starttime=UTCDateTime('1980-01-01'),
-              endtime=UTCDateTime('2025-03-01'),
-              minlongitude=-122.3,
-              maxlongitude=-121.19,
-              minlatitude=46.5,
-              maxlatitude=47.1,
-              minmagnitude=1)
-
-
-x = []
-y = []
-sizes = []
-for i, event in enumerate(catalog):
-    x.append(event.preferred_origin().longitude)
-    y.append(event.preferred_origin().latitude)
-    sizes.append(0.055 * (event.preferred_magnitude().mag ** 1.45))
-
-seis_fig.plot(x=x,
-              y=y,
-              size=sizes,
-              style='cc',
-              fill='orange',
-              transparency=35,
-              pen='0.5p,black')
-
-from scipy.interpolate import CubicSpline, splprep, splev
-import numpy as np
-wrszx_e = [-121.87,-121.84,-121.69,-121.61]
-wrszy_e = [46.97,46.73,46.64,46.59]
+#wrszx_e = [-121.87,-121.84,-121.69,-121.61]
+#wrszy_e = [46.97,46.73,46.64,46.59]
 
 wrszx_e = [-121.84,-121.84,-121.67]
 wrszy_e = [46.97,46.73,46.56]
 
-tck, u = splprep([wrszx_e, wrszy_e], k=2, s=0)
 
-# Generate points along the curve
-t_new = np.linspace(0, 1, 25)
-x_smooth_bspline, y_smooth_bspline = splev(t_new, tck)
-
-
-seis_fig.plot(x=x_smooth_bspline,
-              y=y_smooth_bspline,
-              pen="2p,black,-")  # 2 point thickness, red color, dashed line
-
-#==============================================================================
 wrszx_w = [-122.06,-122.06,-121.93]
 wrszy_w = [47,46.87,46.52]
-tck, u = splprep([wrszx_w, wrszy_w], k=2, s=0)
 
-# Generate points along the curve
-t_new = np.linspace(0, 1, 25)
-x_smooth_bspline, y_smooth_bspline = splev(t_new, tck)
-
-seis_fig.plot(x=x_smooth_bspline,
-              y=y_smooth_bspline,
-              pen="2p,black,-")  # 2 point thickness, red color, dashed line
-
-#=====================================================================
-seis_fig.plot(x=-121.76,
-              y=46.852,
-              style='t1c',
-              fill='red',
-              pen='black')
+seis_fig = gm.plot_curve(seis_fig, wrszx_e, wrszy_e,
+                         k=2, s=0)
+seis_fig = gm.plot_curve(seis_fig, wrszx_w, wrszy_w,
+                         k=2, s=0)
 
 seis_fig.show()
 gm.save_fig(seis_fig,'RainierSeismicity',dpi=960)

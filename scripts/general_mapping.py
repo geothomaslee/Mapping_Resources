@@ -175,7 +175,7 @@ def plot_base_map(region,projection="Q15c+du",figure_name="figure!",
                   resolution='03s',
                   cmap="./Resources/colormaps/cpt-city/colombia.cpt",
                   box_bounds=None,margin=0.1,bathymetry=False,
-                  watercolor=None,colorbar_tick=2000):
+                  watercolor=None,colorbar_tick=2000,data_source: str='igpp'):
     """
     Parameters
     ----------
@@ -213,7 +213,7 @@ def plot_base_map(region,projection="Q15c+du",figure_name="figure!",
 
     bounds = get_margin_from_bounds(region,margin=margin)
 
-    grid = pygmt.datasets.load_earth_relief(resolution=resolution, region=bounds)
+    grid = pygmt.datasets.load_earth_relief(resolution=resolution, region=bounds,data_source=data_source)
     shade = pygmt.grdgradient(grid=grid, azimuth='0/90', normalize='t1')
 
     fig = pygmt.Figure()

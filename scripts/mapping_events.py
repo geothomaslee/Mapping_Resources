@@ -20,6 +20,7 @@ def plot_events(starttime: str,
                 lin_scale: float=0.055,
                 exp_scale: float=1.45,
                 fill: str='orange',
+                debug: bool=False,
                 fig=None,
                 **kwargs):
     """
@@ -71,7 +72,8 @@ def plot_events(starttime: str,
                   minlatitude=minlat,
                   maxlatitude=maxlat,
                   minmagnitude=minmag)
-    print(catalog.__str__(print_all=True))
+    if debug:
+        print(catalog.__str__(print_all=True))
 
     print(f'{len(catalog)} events found')
 

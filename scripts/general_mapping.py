@@ -179,16 +179,17 @@ def plot_base_map(region,projection="Q15c+du",figure_name="figure!",
     """
     Parameters
     ----------
-    bounds : list of ints or floats
-        Region to search for stations, in order [minlon, maxlon, minlat, maxlat]
+    region : list of ints or floats
+        Region to map in format [minlon, maxlon, minlat, maxlat]
     projection : string, optional
         GMT specs for projection. See GMT documentation for more details.
         The default is "Q15c+du".
     figure_name : string, optional
         Title of figure. The default is "figure!".
     resolution : string, optional
-        Resolution of topo data. See pygmt.load_earth_relief for more.
-        The default is '03s'.
+        Resolution of topo data. The default is '03s'. Can be any of '01d',
+        '30m', '20m', '15m', '10m', '06m', '05m', '04m', '03m', '02m', '01m',
+        '30s', '15s', '03s', '01s'
     cmap : string, optional
         Path to colormap. The default is "./Resources/colormaps/cpt-city/colombia.cpt".
     box_bounds : list of ints or floats, optional
@@ -197,6 +198,10 @@ def plot_base_map(region,projection="Q15c+du",figure_name="figure!",
         Margin size, given as a decimal of the total dimensions. The default is 0.1.
     bathymetry : bool
         If False, will replace oceans with solid color. Default is false.
+    watercolor : str
+        If bathymetry is False, color of water. Defaults to skyblue.
+    colorbar_tick : int or float
+        Tick on elevation colorbar.
 
     Returns
     -------
@@ -293,13 +298,15 @@ def plot_label(fig,lat,lon,style='b0.35c',fill='black',label=None,
     return fig
 
 
-def plot_holocene_volcanoes(fig):
+def plot_holocene_volcanoes(fig,size: float=0.35):
     """
     Parameters
     ----------
     fig : pygmt.Figure
         Figure to draw volcanoes on. If only plotting figure, use plot_base_map
         to create initial figure.
+    size : float
+        Size of markers.
 
     Returns
     -------
@@ -314,7 +321,7 @@ def plot_holocene_volcanoes(fig):
 
     fig.plot(x=holocene_vol_lon_list,
              y=holocene_vol_lat_list,
-             style='t0.35c',
+             style=f't{size}c',
              fill='red')
 
     return fig
@@ -344,8 +351,8 @@ def get_map_dimensions(fig):
     return height,width,diag
 
 def plot_major_cities(fig,bounds=None,minpopulation=100000,
-                      fontsize=14,offset=0.02,dotsize=0.35,
-                      dot_color='black',label_color='black',
+                      fontsize=14,offset=0.02,size=0.35,symbol='c',
+                      color='black',label_color='black',
                       close_threshhold = 0.005,
                       hor_offset_multiplier=3.5):
     """
@@ -456,8 +463,8 @@ def plot_major_cities(fig,bounds=None,minpopulation=100000,
     for city in city_list:
         fig.plot(x=city[1],
                  y=city[0],
-                 style=f'c{dotsize}',
-                 fill=dot_color,
+                 style=f'{symbol}{size}',
+                 fill=color,
                  label=city[2])
 
         # Fixes labels near the map edge from going off map

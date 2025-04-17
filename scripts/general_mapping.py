@@ -171,11 +171,11 @@ def find_elevation_range(grid):
 
     return min_elev, max_elev
 
-def plot_base_map(region,projection="Q15c+du",figure_name="figure!",
-                  resolution='03s',
+def plot_base_map(region,projection="Q15c+du",figure_name: str=None, resolution='01m',
                   cmap="./Resources/colormaps/cpt-city/colombia.cpt",
                   box_bounds=None,margin=0.1,bathymetry=False,
-                  watercolor=None,colorbar_tick=2000,data_source: str='igpp'):
+                  watercolor=None,colorbar_tick=2000,data_source: str='igpp',
+                  map_scale: str=None,scalebar_height: float=10):
     """
     Parameters
     ----------
@@ -220,12 +220,18 @@ def plot_base_map(region,projection="Q15c+du",figure_name="figure!",
     fig.basemap(region=bounds,
                 projection=projection,
                 frame=True)
-    fig.grdimage(grid=grid,
-                 shading=shade,
-                 projection=projection,
-                 frame=["a",f"+t{figure_name}"],
-                 cmap=cmap)
-
+    if figure_name is not None:
+        fig.grdimage(grid=grid,
+                     shading=shade,
+                     projection=projection,
+                     frame=["a",f"+t{figure_name}"],
+                     cmap=cmap)
+    else:
+        fig.grdimage(grid=grid,
+                     shading=shade,
+                     projection=projection,
+                     frame=["a"],
+                     cmap=cmap)
 
     if bathymetry:
         fig.colorbar(frame=[f"a{colorbar_tick}", "x+lElevation (m)", "y+lm"])
@@ -252,6 +258,10 @@ def plot_base_map(region,projection="Q15c+du",figure_name="figure!",
         fig.plot(x=blons,
                  y=blats,
                  pen="1p")
+        
+    if map_scale != None:
+        with pygmt.config(MAP_SCALE_HEIGHT=f"{scalebar_height}p"):
+            fig.basemap(map_scale=map_scale)
 
     return fig
 

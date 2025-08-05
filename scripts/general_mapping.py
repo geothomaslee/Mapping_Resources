@@ -258,7 +258,7 @@ def plot_base_map(region,projection="Q15c+du",figure_name: str=None, resolution=
         fig.plot(x=blons,
                  y=blats,
                  pen="1p")
-        
+
     if map_scale != None:
         with pygmt.config(MAP_SCALE_HEIGHT=f"{scalebar_height}p"):
             fig.basemap(map_scale=map_scale)
@@ -308,7 +308,8 @@ def plot_label(fig,lat,lon,style='b0.35c',fill='black',label=None,
     return fig
 
 
-def plot_holocene_volcanoes(fig,size: float=0.35):
+def plot_holocene_volcanoes(fig,size: float=0.35,
+                            style: str='t'):
     """
     Parameters
     ----------
@@ -331,7 +332,7 @@ def plot_holocene_volcanoes(fig,size: float=0.35):
 
     fig.plot(x=holocene_vol_lon_list,
              y=holocene_vol_lat_list,
-             style=f't{size}c',
+             style=f'{style}{size}c',
              fill='red')
 
     return fig

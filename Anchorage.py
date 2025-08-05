@@ -5,6 +5,7 @@ Created on Wed Apr  2 08:59:12 2025
 @author: tlee
 """
 import pygmt
+import os
 from scripts import general_mapping as gm
 from scripts import mapping_events as me
 from scripts import colormap_utils as cu

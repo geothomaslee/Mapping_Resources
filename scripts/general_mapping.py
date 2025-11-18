@@ -13,7 +13,8 @@ import os
 import pandas as pd
 import pygmt
 import numpy as np
-
+from scipy import ndimage
+import math
 
 resource_folder = os.path.join(os.path.dirname(__file__),'../resources')
 
@@ -85,7 +86,7 @@ def get_margin_from_lat_lon(lats,lons,margin=0.1):
 
     return bounds
 
-def get_margin_from_bounds(bounds,margin=0.1):
+def get_margin_from_bounds(bounds,margin=0.1,one_point_fallback_margin: float=0.2):
     """
     Parameters
     ----------
@@ -94,6 +95,10 @@ def get_margin_from_bounds(bounds,margin=0.1):
     margin : int or float, optional
         Margin size, multiplied by the length of the bounds. 0.1 = 10% margin.
         The default is 0.1.
+    one_point_fallback_margin: float, optional
+        If the latitudes are equal AND the longitudes are equal, then a square
+        of side length 2*one_point_fallback_margin centered on the single
+        point will be returned as the bound.
 
     Returns
     -------
@@ -104,10 +109,16 @@ def get_margin_from_bounds(bounds,margin=0.1):
     lons = [bounds[0],bounds[1]]
     lats = [bounds[2],bounds[3]]
 
-    min_lon = min(lons) - (margin * abs(max(lons) - min(lons)))
-    min_lat = min(lats) - (margin * abs(max(lats) - min(lats)))
-    max_lon = max(lons) + (margin * abs(max(lons) - min(lons)))
-    max_lat = max(lats) + (margin * abs(max(lats) - min(lats)))
+    if len(set(lons)) == 1 and len(set(lats)) == 1:
+        min_lon = lons[0] - one_point_fallback_margin
+        max_lon = lons[1] + one_point_fallback_margin
+        min_lat = lats[0] - one_point_fallback_margin
+        max_lat = lats[1] + one_point_fallback_margin
+    else:
+        min_lon = min(lons) - (margin * abs(max(lons) - min(lons)))
+        min_lat = min(lats) - (margin * abs(max(lats) - min(lats)))
+        max_lon = max(lons) + (margin * abs(max(lons) - min(lons)))
+        max_lat = max(lats) + (margin * abs(max(lats) - min(lats)))
 
     if min_lon > max_lon:
         new_max_lon = min_lon
@@ -172,10 +183,11 @@ def find_elevation_range(grid):
     return min_elev, max_elev
 
 def plot_base_map(region,projection="Q15c+du",figure_name: str=None, resolution='01m',
-                  cmap="./Resources/colormaps/cpt-city/colombia.cpt",
+                  cmap="./Resources/colormaps/cpt-city/colombia.cpt", frame: bool=True,
                   box_bounds=None,margin=0.1,bathymetry=False,
                   watercolor=None,colorbar_tick=2000,data_source: str='igpp',
-                  map_scale: str=None,scalebar_height: float=10):
+                  map_scale: str=None,scalebar_height: float=10,
+                  min_elev: float=0, max_elev: float=6000):
     """
     Parameters
     ----------
@@ -217,21 +229,34 @@ def plot_base_map(region,projection="Q15c+du",figure_name: str=None, resolution=
     shade = pygmt.grdgradient(grid=grid, azimuth='0/90', normalize='t1')
 
     fig = pygmt.Figure()
-    fig.basemap(region=bounds,
-                projection=projection,
-                frame=True)
-    if figure_name is not None:
-        fig.grdimage(grid=grid,
-                     shading=shade,
-                     projection=projection,
-                     frame=["a",f"+t{figure_name}"],
-                     cmap=cmap)
-    else:
-        fig.grdimage(grid=grid,
-                     shading=shade,
-                     projection=projection,
-                     frame=["a"],
-                     cmap=cmap)
+    if cmap is not None:
+        if '/' not in cmap:
+            _cmap = True
+            pygmt.makecpt(cmap=cmap, series=[min_elev, max_elev, 10])
+        else:
+            _cmap = cmap
+        _grid = grid
+    else: # If cmap is none, only plot the hillshade
+        _grid = shade
+        _cmap = True
+        pygmt.makecpt(cmap="gray", series=[-1, 1, 0.01])
+
+    if frame:
+        fig.basemap(region=bounds,
+                    projection=projection,
+                    frame=frame)
+
+    grdimage_kwargs = {
+        'grid': _grid,
+        'projection': projection,
+        'frame': ["a", f"+t{figure_name}"] if figure_name and frame else (["a"] if frame else ["g"]),
+        'cmap': _cmap
+    }
+
+    if cmap is not None:
+        grdimage_kwargs['shading'] = shade
+
+    fig.grdimage(**grdimage_kwargs, region=bounds)
 
     if bathymetry:
         fig.colorbar(frame=[f"a{colorbar_tick}", "x+lElevation (m)", "y+lm"])
@@ -262,6 +287,101 @@ def plot_base_map(region,projection="Q15c+du",figure_name: str=None, resolution=
     if map_scale != None:
         with pygmt.config(MAP_SCALE_HEIGHT=f"{scalebar_height}p"):
             fig.basemap(map_scale=map_scale)
+
+    return fig
+
+def plot_base_map3d(region, max_depth: -6000, max_elev: 6200, projection="Q15c+du",
+                    figure_name: str=None, resolution='01m', perspective = [180, 30],
+                    cmap = os.path.join(os.path.dirname( __file__ ), '..', 'Resources', 'colormaps', 'cpt-city', 'colombia.cpt'),
+                    box_bounds=None,margin=0.1,bathymetry=False,
+                    watercolor=None,colorbar_tick=2000,data_source: str='igpp',
+                    map_scale: str=None,scalebar_height: float=10):
+    """
+    Parameters
+    ----------
+    region : list of ints or floats
+        Region to map in format [minlon, maxlon, minlat, maxlat]
+    projection : string, optional
+        GMT specs for projection. See GMT documentation for more details.
+        The default is "Q15c+du".
+    figure_name : string, optional
+        Title of figure. The default is "figure!".
+    resolution : string, optional
+        Resolution of topo data. The default is '03s'. Can be any of '01d',
+        '30m', '20m', '15m', '10m', '06m', '05m', '04m', '03m', '02m', '01m',
+        '30s', '15s', '03s', '01s'
+    cmap : string, optional
+        Path to colormap. The default is "./Resources/colormaps/cpt-city/colombia.cpt".
+    box_bounds : list of ints or floats, optional
+        Bounds of box to draw on figure. If none given, none will be drawn.
+    margin : float or int, optional
+        Margin size, given as a decimal of the total dimensions. The default is 0.1.
+    bathymetry : bool
+        If False, will replace oceans with solid color. Default is false.
+    watercolor : str
+        If bathymetry is False, color of water. Defaults to skyblue.
+    colorbar_tick : int or float
+        Tick on elevation colorbar.
+
+    Returns
+    -------
+    fig : pygmt.Figure
+        PyGMT figure to use as basemap
+    """
+    if not watercolor:
+        watercolor = "skyblue"
+
+    bounds = get_margin_from_bounds(region,margin=margin)
+
+    grid = pygmt.datasets.load_earth_relief(resolution=resolution, region=bounds,data_source=data_source)
+    shade = pygmt.grdgradient(grid=grid, azimuth='90/50', normalize='t1')
+
+    fig = pygmt.Figure()
+    if figure_name is not None:
+        fig.grdview(region=bounds,
+                    grid=grid,
+                    projection=projection,
+                    cmap=cmap,
+                    surftype='s',
+                    perspective=perspective,
+                    zsize='1c',
+                    frame=True,
+                    plane=f'{max_depth}+gazure',
+                    #frame=["a",f"+t{figure_name}"],
+                    shading=True)
+    else:
+        fig.grdview(region=bounds,
+                    grid=grid,
+                    projection=projection,
+                    cmap=cmap,
+                    surftype='s',
+                    perspective=perspective,
+                    frame=["a"],
+                    contourpen='1p')
+
+    """
+    if figure_name is not None:
+        fig.grdimage(grid=grid,
+                     shading=shade,
+                     projection=projection,
+                     frame=["a",f"+t{figure_name}"],
+                     cmap=cmap)
+    else:
+        fig.grdimage(grid=grid,
+                     shading=shade,
+                     projection=projection,
+                     frame=["a"],
+                     cmap=cmap)
+
+    if bathymetry:
+        fig.colorbar(frame=[f"a{colorbar_tick}", "x+lElevation (m)", "y+lm"])
+    if not bathymetry:
+        fig.coast(shorelines="4/0.5p,black",
+                  projection=projection,
+                  borders="a/1.2p,black",
+                  water=watercolor,
+                  resolution="f")
+    """
 
     return fig
 
@@ -309,7 +429,7 @@ def plot_label(fig,lat,lon,style='b0.35c',fill='black',label=None,
 
 
 def plot_holocene_volcanoes(fig,size: float=0.35,
-                            style: str='t'):
+                            style: str='t', fill: str='red'):
     """
     Parameters
     ----------
@@ -332,8 +452,8 @@ def plot_holocene_volcanoes(fig,size: float=0.35,
 
     fig.plot(x=holocene_vol_lon_list,
              y=holocene_vol_lat_list,
-             style=f'{style}{size}c',
-             fill='red')
+             style=f'{style}/{size}c',
+             fill=fill)
 
     return fig
 
@@ -526,6 +646,12 @@ def save_fig(fig,name,dpi=720,ftype="png"):
     fig.savefig(fname=fname,
                 dpi=dpi)
 
+def plot_outline(fig, x, y, linewidth: float=2.5, style: str='-.-'):
+    fig.plot(x=x,
+             y=y,
+             pen=f'{linewidth}p,{style}')
+    return fig
+
 def plot_curve(fig, x, y, size: float=2, color: str='black',
                style: str='-', **kwargs):
     from scipy.interpolate import splprep, splev
@@ -547,3 +673,154 @@ def plot_text(fig, text, **kwargs):
     fig.text(text=text, **kwargs)
     return fig
 
+def plot_arrow_and_label(fig: pygmt.Figure, label: str, x: int or float,
+                         y: int or float, angle: int or float,
+                         label_dx: int or float=0.1, label_dy: int or float=0.1,
+                         arrow_dx: int or float=0, arrow_dy: int or float=0,
+                         arrowh_color='red', label_transparency: int=50, arrowh_width: int or float=1,
+                         arrow_length: int or float=10, arrow_width: int or float=1,
+                         arrowh_angle: int or float=50, arrowh_sharpness: int or float=0.5,
+                         font_size: int or float=12,arrow_color: str='black'):
+    fig.plot(x=x + arrow_dx,
+             y=y + arrow_dy,
+             projection='M15c',
+             style=f'v{arrowh_width}c+e+h{arrowh_sharpness}+a{arrowh_angle}',
+             direction=([angle],[arrow_length]),
+             pen=f'{arrow_width}p,{arrow_color}',
+             fill=arrowh_color)
+    fig.text(text=label,
+             font=f'{font_size}p,Helvetica-Bold,black',
+             x=x + label_dx,
+             y=y + label_dy,
+             transparency=label_transparency)
+    return fig
+
+def find_least_populated_area(lats, lons, bounds, grid_size=(10, 10), buffer_ratio=0.3):
+    """
+    Find the least populated area on a map using grid-based density analysis.
+
+    Parameters:
+    lats: array-like of latitude coordinates
+    lons: array-like of longitude coordinates
+    bounds: tuple of (min_lon, max_lon, min_lat, max_lat)
+    grid_size: tuple of (rows, cols) for grid resolution
+    buffer_ratio: fraction of map size to use as buffer from edges
+
+    Returns:
+    best_position: (lat, lon) of least populated area
+    density_grid: 2D array of point counts per grid cell
+    """
+    lats = np.array(lats)
+    lons = np.array(lons)
+    min_lon, max_lon, min_lat, max_lat = bounds
+
+    # Create grid
+    lat_edges = np.linspace(min_lat, max_lat, grid_size[0] + 1)
+    lon_edges = np.linspace(min_lon, max_lon, grid_size[1] + 1)
+
+    # Count points in each grid cell
+    density_grid, _, _ = np.histogram2d(
+        lats, lons,
+        bins=[lat_edges, lon_edges]
+    )
+
+    # Apply Gaussian smoothing to avoid edge artifacts and prefer areas away from points
+    smoothed_density = ndimage.gaussian_filter(density_grid, sigma=0.8)
+
+    # Create buffer mask to avoid placing labels too close to edges
+    buffer_lat = (max_lat - min_lat) * buffer_ratio
+    buffer_lon = (max_lon - min_lon) * buffer_ratio
+
+    lat_centers = (lat_edges[:-1] + lat_edges[1:]) / 2
+    lon_centers = (lon_edges[:-1] + lon_edges[1:]) / 2
+
+    # Create mask for valid (non-edge) positions
+    valid_mask = np.ones_like(smoothed_density, dtype=bool)
+
+    # Apply buffer
+    lat_mask = (lat_centers >= min_lat + buffer_lat) & (lat_centers <= max_lat - buffer_lat)
+    lon_mask = (lon_centers >= min_lon + buffer_lon) & (lon_centers <= max_lon - buffer_lon)
+
+    valid_mask[~lat_mask, :] = False
+    valid_mask[:, ~lon_mask] = False
+
+    # Find minimum density position within valid area
+    masked_density = np.where(valid_mask, smoothed_density, np.inf)
+    min_idx = np.unravel_index(np.argmin(masked_density), masked_density.shape)
+
+    best_lat = lat_centers[min_idx[0]]
+    best_lon = lon_centers[min_idx[1]]
+
+    return best_lon, best_lat
+
+def haversine_distance(lon1, lat1, lon2, lat2):
+    R = 6371.0
+    # Convert decimal degrees to radians
+    lat1_rad = math.radians(lat1)
+    lon1_rad = math.radians(lon1)
+    lat2_rad = math.radians(lat2)
+    lon2_rad = math.radians(lon2)
+
+    # Calculate differences
+    dlat = lat2_rad - lat1_rad
+    dlon = lon2_rad - lon1_rad
+
+    # Haversine formula
+    a = math.sin(dlat/2)**2 + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(dlon/2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+
+    # Distance in kilometers
+    distance = R * c
+    return distance
+
+def haversine_distance_degrees(lon1, lat1, lon2, lat2):
+    R = 6371.0
+    # Convert decimal degrees to radians
+    lat1_rad = math.radians(lat1)
+    lon1_rad = math.radians(lon1)
+    lat2_rad = math.radians(lat2)
+    lon2_rad = math.radians(lon2)
+
+    # Calculate differences
+    dlat = lat2_rad - lat1_rad
+    dlon = lon2_rad - lon1_rad
+
+    # Haversine formula
+    a = math.sin(dlat/2)**2 + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(dlon/2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+
+    # Distance in kilometers
+    distance = R * c
+    return distance
+
+def azimuthal_direction(lon1, lat1, lon2, lat2):
+    """
+    Calculate the azimuthal direction from point 1 to point 2 on Earth's surface.
+
+    Args:
+        lon1, lat1: Longitude and latitude of starting point (degrees)
+        lon2, lat2: Longitude and latitude of ending point (degrees)
+
+    Returns:
+        Azimuth in degrees (0 = North, positive counterclockwise)
+    """
+    # Convert degrees to radians
+    lat1_rad = math.radians(lat1)
+    lat2_rad = math.radians(lat2)
+    dlon_rad = math.radians(lon2 - lon1)
+
+    # Calculate azimuth using spherical trigonometry
+    y = math.sin(dlon_rad) * math.cos(lat2_rad)
+    x = (math.cos(lat1_rad) * math.sin(lat2_rad) -
+         math.sin(lat1_rad) * math.cos(lat2_rad) * math.cos(dlon_rad))
+
+    # Calculate azimuth in radians
+    azimuth_rad = math.atan2(y, x)
+
+    # Convert to degrees
+    azimuth_deg = math.degrees(azimuth_rad)
+
+    # Ensure result is in range [0, 360)
+    azimuth_deg = (azimuth_deg + 360) % 360
+
+    return azimuth_deg

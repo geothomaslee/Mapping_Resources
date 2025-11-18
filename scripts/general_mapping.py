@@ -249,7 +249,7 @@ def plot_base_map(region,projection="Q15c+du",figure_name: str=None, resolution=
     grdimage_kwargs = {
         'grid': _grid,
         'projection': projection,
-        'frame': ["a", f"+t{figure_name}"] if figure_name and frame else (["a"] if frame else ["g"]),
+        'frame': ["a", f"+t{figure_name}"] if figure_name and frame else (["a"] if frame else ["f"]),
         'cmap': _cmap
     }
 
@@ -824,3 +824,21 @@ def azimuthal_direction(lon1, lat1, lon2, lat2):
     azimuth_deg = (azimuth_deg + 360) % 360
 
     return azimuth_deg
+
+def draw_rectangle(fig, minlon, maxlon, minlat, maxlat,
+                   linewidth=1,linecolor='black', transparency=0):
+
+    # Create rectangle coordinates (closed polygon)
+    x = [minlon, maxlon, maxlon, minlon, minlon]
+    y = [minlat, minlat, maxlat, maxlat, minlat]
+
+    # Draw the rectangle with no fill
+    fig.plot(
+        x=x,
+        y=y,
+        pen=f'{linewidth}p,{linecolor}',
+        transparency=transparency,
+        straight_line=True
+    )
+
+    return fig

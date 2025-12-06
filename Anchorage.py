@@ -14,13 +14,13 @@ from scripts import colormap_utils as cu
 #=============================Regional Overview================================
 cmap = cu.create_combined_color_map('usgs','colombia',max_elev=6200,max_depth=-6000)
 
-reg = me.plot_events(starttime='1960-01-01',
-                     endtime='2025-04-01',
+reg = me.plot_events(starttime='2015-01-01',
+                     endtime='2025-08-01',
                      minlon=-178,
                      maxlon=-138,
                      minlat=50,
                      maxlat=62,
-                     minmag=7.5,
+                     minmag=6.5,
                      lin_scale=0.00004,
                      exp_scale=4.75,
                      fill='red',

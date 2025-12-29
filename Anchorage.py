@@ -15,7 +15,7 @@ from scripts import colormap_utils as cu
 cmap = cu.create_combined_color_map('usgs','colombia',max_elev=6200,max_depth=-6000)
 
 reg = me.plot_events(starttime='2015-01-01',
-                     endtime='2025-08-01',
+                     endtime='2025-12-01',
                      minlon=-178,
                      maxlon=-138,
                      minlat=50,
@@ -23,15 +23,19 @@ reg = me.plot_events(starttime='2015-01-01',
                      minmag=6.5,
                      lin_scale=0.00004,
                      exp_scale=4.75,
+                     color_by_date=True,
                      fill='red',
-                     region=[-178,-138,50,63],
+                     region=[-175,-142,51,61],
                      projection='M-158/56.5/12c',
-                     figure_name='Earthquakes >M6, 1960-2025',
+                     figure_name='Earthquakes >M6.5, 2015-2025',
                      resolution='30s',
                      cmap=cmap,
+                     show_colorbar=False,
                      bathymetry=True)
 
 reg.coast(borders=1)
+
+"""
 reg.plot(x=-143.5,
          y=54,
          style="v1c+e+h0.5",
@@ -62,6 +66,7 @@ reg = gm.plot_major_cities(reg,
                            size=0.75,
                            color='yellow',
                            hor_offset_multiplier=2)
+"""
 
 reg.show()
 gm.save_fig(reg,name='AlaskaRegion',dpi=1280)

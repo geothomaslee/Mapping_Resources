@@ -187,7 +187,8 @@ def plot_base_map(region,projection="Q15c+du",figure_name: str=None, resolution=
                   box_bounds=None,margin=0.1,bathymetry=False,
                   watercolor=None,colorbar_tick=2000,data_source: str='igpp',
                   map_scale: str=None,scalebar_height: float=10,
-                  min_elev: float=0, max_elev: float=6000):
+                  min_elev: float=0, max_elev: float=6000,
+                  show_colorbar: bool=True):
     """
     Parameters
     ----------
@@ -214,7 +215,8 @@ def plot_base_map(region,projection="Q15c+du",figure_name: str=None, resolution=
         If bathymetry is False, color of water. Defaults to skyblue.
     colorbar_tick : int or float
         Tick on elevation colorbar.
-
+    show_colorbar : bool, optional
+        If True, shows the topography colorbar. The default is True.
     Returns
     -------
     fig : pygmt.Figure
@@ -222,12 +224,9 @@ def plot_base_map(region,projection="Q15c+du",figure_name: str=None, resolution=
     """
     if not watercolor:
         watercolor = "skyblue"
-
     bounds = get_margin_from_bounds(region,margin=margin)
-
     grid = pygmt.datasets.load_earth_relief(resolution=resolution, region=bounds,data_source=data_source)
     shade = pygmt.grdgradient(grid=grid, azimuth='0/90', normalize='t1')
-
     fig = pygmt.Figure()
     if cmap is not None:
         if '/' not in cmap:
@@ -240,25 +239,20 @@ def plot_base_map(region,projection="Q15c+du",figure_name: str=None, resolution=
         _grid = shade
         _cmap = True
         pygmt.makecpt(cmap="gray", series=[-1, 1, 0.01])
-
     if frame:
         fig.basemap(region=bounds,
                     projection=projection,
                     frame=frame)
-
     grdimage_kwargs = {
         'grid': _grid,
         'projection': projection,
         'frame': ["a", f"+t{figure_name}"] if figure_name and frame else (["a"] if frame else ["f"]),
         'cmap': _cmap
     }
-
     if cmap is not None:
         grdimage_kwargs['shading'] = shade
-
     fig.grdimage(**grdimage_kwargs, region=bounds)
-
-    if bathymetry:
+    if bathymetry and show_colorbar:
         fig.colorbar(frame=[f"a{colorbar_tick}", "x+lElevation (m)", "y+lm"])
     if not bathymetry:
         fig.coast(shorelines="4/0.5p,black",
@@ -266,28 +260,21 @@ def plot_base_map(region,projection="Q15c+du",figure_name: str=None, resolution=
                   borders="a/1.2p,black",
                   water=watercolor,
                   resolution="f")
-
-
     if box_bounds != None:
         if len(bounds) != 4:
             raise ValueError(f'Expected 4 items in box_bounds, got {len(box_bounds)}')
-
         bminlon = box_bounds[0]
         bmaxlon = box_bounds[1]
         bminlat = box_bounds[2]
         bmaxlat = box_bounds[3]
-
         blats = [bminlat, bmaxlat, bmaxlat, bminlat, bminlat]
         blons = [bminlon, bminlon, bmaxlon, bmaxlon, bminlon]
-
         fig.plot(x=blons,
                  y=blats,
                  pen="1p")
-
     if map_scale != None:
         with pygmt.config(MAP_SCALE_HEIGHT=f"{scalebar_height}p"):
             fig.basemap(map_scale=map_scale)
-
     return fig
 
 def plot_base_map3d(region, max_depth: -6000, max_elev: 6200, projection="Q15c+du",
